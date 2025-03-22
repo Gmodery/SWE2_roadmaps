@@ -77,7 +77,7 @@ def join_class_view(request):
     
     # Redirect if not a student
     if request.session["usertype"] != "student":
-        redirect('dashboard')
+        return redirect('dashboard')
 
     if request.method == 'POST':
         # Get class code and match against database, if possible
@@ -90,7 +90,7 @@ def join_class_view(request):
             messages.success(f"{class_instance.class_name} joined!")
 
         except Class.DoesNotExist:
-            messages.error("Invalid Class Code")
+            messages.error(request, "Invalid Class Code")
 
 
     return redirect("dashboard")
@@ -113,37 +113,13 @@ def dashboard(request):
     # Instructor view
     elif request.session["usertype"] == "instructor":
         if request.method == "POST":
-            def get_unique_code():
-                code = None
-                
-                while code == None:
-                    characters = string.ascii_letters + string.digits
-                    code = ''.join(random.choices(characters, k=5))
-
-                    _class = Class.objects.filter(class_join_code=code)
-
-                    if _class:
-                        code == None
-
-                return code
-                
-
             form = CreateClassForm(request.POST)
 
             if form.is_valid():                
-                class_code = get_unique_code()
-
-                class_name = form.cleaned_data['class_name']
-                class_desc = form.cleaned_data['class_desc']
-
-                new_class = Class (
-                    class_name=class_name,
-                    class_desc=class_desc,
-                    class_instructor=AppUser.objects.get(id=request.session['user_id']),
-                    class_join_code=class_code
-                )
-
-                new_class.save()
+                new_class = form.save(commit=False)  # Don't save yet
+                new_class.class_instructor = AppUser.objects.get(id=request.session['user_id'])
+                new_class.class_join_code = new_class.generate_unique_code()  # Generate join code
+                new_class.save()  # Now save
 
                 messages.success(request, "Class Creation Successful!")
                 

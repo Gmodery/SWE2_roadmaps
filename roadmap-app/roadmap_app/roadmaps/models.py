@@ -32,6 +32,9 @@ class Class(models.Model):
     class_join_code = models.CharField(unique=True, max_length=5, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def generate_unique_code(self):
+        return ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+
     def __str__(self):
         return self.class_name
 
