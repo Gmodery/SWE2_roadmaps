@@ -11,8 +11,6 @@ from django.contrib import messages
 from .forms import SignUpForm, CreateClassForm
 from django.contrib.auth.decorators import login_required
 
-# Comment
-
 def home(request):
     return render(request, 'roadmaps/home.html')
 
@@ -35,7 +33,7 @@ def login_view(request):
 
             return redirect("dashboard")  # Redirect to a protected page
         else:
-            messages.error(request, "Invalid username or password")
+            messages.error(request, "Invalid username or password", extra_tags="login")
 
     # Else just render index.html
     return render(request, 'roadmaps/index.html')
@@ -77,20 +75,23 @@ def join_class_view(request):
     
     # Redirect if not a student
     if request.session["usertype"] != "student":
-        redirect('dashboard')
+        return redirect('dashboard')
 
-    if request.method == 'POST':
-        # Get class code and match against database, if possible
-        join_code = request.POST.get('join_code')
+    if request.method == "POST":
+            join_code = request.POST['join_code']
 
-        try:
-            class_instance = Class.objects.get(class_join_code=join_code)
-            class_instance.class_student.add(AppUser.objects.get(id=request.session['user_id']))
+            target_class = Class.objects.get(class_join_code=join_code)
+            student = AppUser.objects.get(id=request.session["user_id"])
 
-            messages.success(f"{class_instance.class_name} joined!")
+            if target_class and student not in target_class.class_student.all():
+                print("adding")
+                target_class.class_student.add(student)
+                messages.success(request, f"{target_class.class_name} joined!")
 
-        except Class.DoesNotExist:
-            messages.error("Invalid Class Code")
+            else:
+                print("not adding")
+                messages.error(request, "Class code invalid")
+                return redirect('dashboard')
 
 
     return redirect("dashboard")
@@ -100,10 +101,6 @@ def join_class_view(request):
 def dashboard(request):
     # Student view
     if request.session["usertype"] == "student":
-        if request.method == "POST":
-            pass
-
-
 
         return render(request, 'roadmaps/pages/dashboard.html', {"username": request.session['username'], 
                                                                  "classes" : AppUser.objects.get(id=request.session['user_id']).student_classes.all(), 
@@ -145,9 +142,13 @@ def dashboard(request):
 
                 new_class.save()
 
-                messages.success(request, "Class Creation Successful!")
+                messages.success(request, "Class creation successful!")
                 
                 # Refresh the page with the new class
+                return redirect('dashboard')
+            
+            else:
+                messages.error(request, "Class creation failed")
                 return redirect('dashboard')
             
 
@@ -218,8 +219,14 @@ def class_detail_view(request, class_id):
     # Validate authorization to view this class
     if request.session['usertype'] == "student":
         # If student, verify that they are in this class
-        students = selected_class.class_student
-        print(students, type(students))
+        class_students = selected_class.class_student.all()
+        current_student = AppUser.objects.get(id=request.session['user_id'])
+        
+        print(class_students)
+
+        if current_student not in class_students:
+            print("not in")
+            return redirect('dashboard')
 
     elif request.session['usertype'] == "instructor":
         # If instructor, verify that they own this class
