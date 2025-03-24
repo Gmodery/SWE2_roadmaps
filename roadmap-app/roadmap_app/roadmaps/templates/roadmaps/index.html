@@ -26,7 +26,9 @@
         {% if messages %}
         <ul>
             {% for message in messages %}
-            <li>{{ message }}</li>
+                {% if message.tags == "login error" %}
+                    <li>{{ message }}</li>
+                {% endif %}
             {% endfor %}
         </ul>
         {% endif %}
