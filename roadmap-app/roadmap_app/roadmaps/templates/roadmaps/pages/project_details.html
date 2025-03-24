@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <h2>Dashboard</h2>
+            <ul>
+                <li><a href="{% url 'dashboard' %}">Home</a></li>
+                <li><a href="{% url 'account' %}">Account</a></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            </ul>
+
+            <div class="join-class">
+            </div>
+        </div>
+
+        <!-- Main Dashboard Content -->
+        <div class="main-content">
+            <h1>{{ project_instance.project_title }}</h1>
+            <p>{{ project_instance.project_description }}</p>
+
+            <hr>
+
+            <div class="course-grid">
+                {% for roadmap in roadmaps %}
+                    <a href="{% url 'roadmap-details' class_instance_id project.id roadmap.id %}" class="course-card">
+                        <h2>{{ roadmap.roadmap_title }}</h2>
+                        <p>{{ roadmap.roadmap_description }}</p>
+
+                            {% for student in roadmap.roadmap_students %}
+                                <p>{{ student.first_name }} {{ student.last_name }},</p>
+                            {% endfor %}
+                    </a>
+                    {% empty %}
+                    {% if not student %}
+                        <p>No roadmaps listed. Create groups below!</p>
+                        
+                    {% else %}
+                        <p>You haven't been added to any roadmaps yet for this project</p>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <hr>
+            <h2>Project Functions</h2>
+
+            {% if not student %}
+
+            {% endif %}
+        </div>
+        
+
+    </div>
+
+</body>
+
+</html>

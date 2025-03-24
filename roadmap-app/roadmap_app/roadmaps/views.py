@@ -8,7 +8,7 @@ import random, string
 from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .forms import SignUpForm, CreateClassForm
+from .forms import SignUpForm, CreateClassForm, CreateProjectForm
 from django.contrib.auth.decorators import login_required
 
 def home(request):
@@ -196,9 +196,6 @@ def create_roadmap_form(request):
 
 
     else:
-        class_id = 6
-        # class_id = request.session['class_id'] # Use this instead when set up
-
         if not class_instance:
             students = None
 
@@ -233,12 +230,13 @@ def class_detail_view(request, class_id):
     class_instructor = selected_class.class_instructor
     class_code = selected_class.class_join_code
 
-    projects = Project.objects.filter(class_id=class_id)
+    projects = Project.objects.filter(class_instance=selected_class)
 
+    project_form = CreateProjectForm()
 
     return render(request, "roadmaps/pages/class_details.html", {"projects": projects, "class_name": class_name,
                   "class_desc": class_desc, "class_instructor": class_instructor, "class_code": class_code, 
-                  "student": request.session['usertype'] == "student", "class_instance_id": class_id})
+                  "student": request.session['usertype'] == "student", "class_instance_id": class_id, "proj_form": project_form})
 
 
 @login_required(login_url='login')
@@ -246,6 +244,71 @@ def class_delete_view(request, class_id):
     Class.objects.get(id=class_id).delete()
     return redirect('dashboard')
     
+
+@login_required(login_url='login')
+def create_project_view(request, class_id):
+    if request.method == "POST" and request.session['usertype'] == 'instructor':
+        form = CreateProjectForm(request.POST)
+
+        if form.is_valid():
+            proj_title = form.cleaned_data['project_name']
+            proj_desc = form.cleaned_data['project_desc']
+
+            instructor = AppUser.objects.get(id=request.session['user_id'])
+
+            new_proj = Project (
+                project_title=proj_title,
+                project_description=proj_desc,
+                project_instructor=instructor,
+                class_instance=Class.objects.get(id=class_id)
+            )
+
+            new_proj.save()
+
+        return redirect(request.META.get('HTTP_REFERER', 'dashboard'))
+
+        
+    else:
+        return redirect("dashboard")
+
+
+def project_details_view(request, class_id, project_id):
+    class_instance = Class.objects.get(id=class_id)
+    project_instance = Project.objects.get(id=project_id)
+
+    # Validate authorization to view this class
+    if request.session['usertype'] == "student":
+        # If student, verify that they are in this class
+        class_students = class_instance.class_student.all()
+        current_student = AppUser.objects.get(id=request.session['user_id'])
+
+        if current_student not in class_students:
+            return redirect('dashboard')
+        
+        all_maps = Roadmap.objects.filter(parent_project=project_instance)
+        roadmaps = []
+
+        for roadmap in all_maps:
+            if current_student in roadmap.class_student.all():
+                roadmaps.append(roadmap)
+
+
+
+    elif request.session['usertype'] == "instructor":
+        # If instructor, verify that they own this class
+        if class_instance.class_instructor.id != request.session['user_id']:
+            return redirect('dashboard')
+        
+        # If instructor, able to view all roadmaps for this project
+        roadmaps = Roadmap.objects.filter(parent_project=project_instance)
+        
+
+    
+
+
+
+    return render(request, "roadmaps/pages/project_details.html", {"student": request.session['usertype'] == "student", "class_instance": class_instance,
+                                                                   "project_instance": project_instance, "roadmaps": roadmaps})
 
 
 @login_required(login_url='login')
@@ -264,7 +327,7 @@ def account_detail_view(request):
 
 
 @login_required(login_url='login')
-def roadmap_view(request):
+def roadmap_details_view(request):
     if request.method == "POST":
         pass
 

@@ -41,7 +41,7 @@ class Project(models.Model):
     project_title = models.CharField(max_length=25)
     project_description = models.TextField(blank=True, null=True)
     project_instructor = models.ForeignKey(AppUser, on_delete=models.DO_NOTHING)
-    class_id = models.ManyToManyField(Class) # Many projects linked to many classes
+    class_instance = models.ForeignKey(Class, on_delete=models.CASCADE, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -52,6 +52,7 @@ class Roadmap(models.Model):
     roadmap_title = models.CharField(max_length=25)
     roadmap_description = models.TextField()
     roadmap_students = models.ManyToManyField(AppUser) # One student can have many roadmaps, and one roadmap can have many students
+    parent_project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     metadata = models.JSONField(default=dict)
@@ -59,16 +60,14 @@ class Roadmap(models.Model):
     def __str__(self):
         return self.roadmap_title
 
-# I moved this up here since it needs to be defined before being used in Task
+
 class TaskCategory(models.Model):
-    # A unique name for each category.
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=50)
 
     def __str__(self):
         return self.name
 
 class Task(models.Model):
-    # Good idea having specific choices. When would a task be in the pending state?
     TASK_STATUS_CHOICES = (
         ('not_started', 'Not Started'),
         ('pending', 'Pending'),
@@ -77,25 +76,18 @@ class Task(models.Model):
     )
 
     # Link each task to a Roadmap
-    # I changed the first argument to be the roadmap class, rather than a string
     task_roadmap = models.ForeignKey(Roadmap, on_delete=models.CASCADE, related_name="tasks")
     task_name = models.CharField(max_length=100)
     task_description = models.TextField()
     status = models.CharField(max_length=20, choices=TASK_STATUS_CHOICES, default='pending')
     # Use a ForeignKey to connect the task to a category 
     category = models.ForeignKey(TaskCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name="task_cat")
-    start_time = models.DateTimeField()
-    end_time = models.DateTimeField()
+    start_time = models.DateField()
+    end_time = models.DateField()
 
     def __str__(self):
         return self.task_name
-    
 
-"""
-Good changes, just make sure to run manage.py makemigrations and manage.py migrate
-so that the changes take effect in the DB. If you want to throw together an html page
-and a view to create and update a task that would be good to get an idea of how it works
-"""
     
 
 class Attachment(models.Model):

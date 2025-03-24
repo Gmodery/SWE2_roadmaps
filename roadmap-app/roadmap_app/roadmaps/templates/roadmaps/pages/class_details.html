@@ -37,9 +37,12 @@
             
             
             <p>{{ class_desc }}</p>
+
+            <hr>
+
             <div class="course-grid">
                 {% for project in projects %}
-                    <a href="{% url 'project_details' project.id %}" class="course-card">
+                    <a href="{% url 'project-details' class_instance_id project.id %}" class="course-card">
                         <h2>{{ project.project_title }}</h2>
                         <p>{{ project.project_description }}</p>
                     </a>
@@ -48,8 +51,29 @@
                 {% endfor %}
             </div>
 
+            <hr>
+            <h2>Class Functions</h2>
 
             {% if not student %}
+                <div class="create-project">
+                    <hr>
+                    <form action="{% url 'project-create' class_instance_id %}" method="POST">
+                        {% csrf_token %}
+                        <div>
+                            <div><h3>Create Project</h3></div>
+                            <div><p>Project Title</p></div>
+                            <div>{{ proj_form.project_name }}</div>
+                            <div><p>Project Description</p></div>
+                            <div>{{ proj_form.project_desc }}</div>
+                            <div><button type="submit">Create Project</button></div>
+                        </div>
+                    </form>
+                </div>
+
+                <hr>
+
+                <h3>Delete Class</h3>
+
                 <div class="remove-class">
                     <form action="{% url 'class_delete' class_instance_id %}" method="POST" onsubmit="return confirm('Are you sure you want to delete this class?');">
                         {% csrf_token %}

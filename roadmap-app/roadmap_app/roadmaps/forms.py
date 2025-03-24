@@ -1,5 +1,5 @@
 from django import forms
-from .models import AppUser, Class, Roadmap
+from .models import AppUser, Class, Roadmap, Project
 from django.contrib.auth.forms import UserCreationForm
 
 # forms.py handles form validation and structure and can be called
@@ -21,6 +21,15 @@ class CreateClassForm(forms.ModelForm):
     class Meta:
         model = Class
         fields = ["class_name", "class_desc"]
+
+
+class CreateProjectForm(forms.ModelForm):
+    project_name = forms.CharField(max_length=30, required=True)
+    project_desc = forms.CharField(max_length=160, required=True)
+
+    class Meta:
+        model = Project
+        fields = ["project_name", "project_description"]
 
 
 class CreateRoadmapForm(forms.ModelForm):
