@@ -28,6 +28,7 @@ urlpatterns = [
     path("pages/dashboard/create-roadmap", views.create_roadmap_form, name="create_roadmap"),
     path("pages/dashboard/join-class", views.join_class_view, name="join_class"),
     path('pages/dashboard/class/<int:class_id>/', views.class_detail_view, name='class_detail'),
+    path('pages/dashboard/remove-class/<int:class_id>/', views.class_delete_view, name='class_delete'),
     path('pages/dashboard/account', views.account_detail_view, name='account')
 ]
 

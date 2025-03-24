@@ -47,6 +47,16 @@
                     <p>No projects listed</p>
                 {% endfor %}
             </div>
+
+
+            {% if not student %}
+                <div class="remove-class">
+                    <form action="{% url 'class_delete' class_instance_id %}" method="POST" onsubmit="return confirm('Are you sure you want to delete this class?');">
+                        {% csrf_token %}
+                        <button type="submit">Delete Class</button>
+                    </form>
+                </div>
+            {% endif %}
         </div>
 
     </div>

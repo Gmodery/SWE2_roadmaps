@@ -84,12 +84,10 @@ def join_class_view(request):
             student = AppUser.objects.get(id=request.session["user_id"])
 
             if target_class and student not in target_class.class_student.all():
-                print("adding")
                 target_class.class_student.add(student)
                 messages.success(request, f"{target_class.class_name} joined!")
 
             else:
-                print("not adding")
                 messages.error(request, "Class code invalid")
                 return redirect('dashboard')
 
@@ -221,11 +219,8 @@ def class_detail_view(request, class_id):
         # If student, verify that they are in this class
         class_students = selected_class.class_student.all()
         current_student = AppUser.objects.get(id=request.session['user_id'])
-        
-        print(class_students)
 
         if current_student not in class_students:
-            print("not in")
             return redirect('dashboard')
 
     elif request.session['usertype'] == "instructor":
@@ -242,7 +237,15 @@ def class_detail_view(request, class_id):
 
 
     return render(request, "roadmaps/pages/class_details.html", {"projects": projects, "class_name": class_name,
-                  "class_desc": class_desc, "class_instructor": class_instructor, "class_code": class_code, "student": request.session['usertype'] == "student"})
+                  "class_desc": class_desc, "class_instructor": class_instructor, "class_code": class_code, 
+                  "student": request.session['usertype'] == "student", "class_instance_id": class_id})
+
+
+@login_required(login_url='login')
+def class_delete_view(request, class_id):
+    Class.objects.get(id=class_id).delete()
+    return redirect('dashboard')
+    
 
 
 @login_required(login_url='login')
