@@ -53,10 +53,39 @@
                 {% endfor %}
             </div>
 
-            <hr>
-            <h2>Project Functions</h2>
+            
 
             {% if not student %}
+                <hr>
+                <h2>Project Functions</h2>
+                
+                <div class="create-function">
+                    <hr>
+                    <form action="{% url 'roadmap-create' class_instance.id project_instance.id %}" method="GET">
+                        {% csrf_token %}
+                        <div>
+                            <div>
+                                <h3>Create Roadmaps</h3>
+                            </div>
+                            <div>
+                                <div><button type="submit">Create Roadmaps</button></div>
+                            </div>
+                            
+                        </div>
+                    </form>
+                </div>
+                
+                <hr>
+                
+                <h3>Delete Project</h3>
+                
+                <div class="remove-function">
+                    <form action="{% url 'project-delete' class_instance.id project_instance.id %}" method="POST"
+                        onsubmit="return confirm('Are you sure you want to delete this project? All assigned roadmaps will also be deleted!');">
+                        {% csrf_token %}
+                        <button type="submit">Delete Project</button>
+                    </form>
+                </div>
 
             {% endif %}
         </div>

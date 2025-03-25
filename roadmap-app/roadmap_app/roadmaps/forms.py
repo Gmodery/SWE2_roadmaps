@@ -30,12 +30,3 @@ class CreateProjectForm(forms.ModelForm):
     class Meta:
         model = Project
         fields = ["project_name", "project_description"]
-
-
-class CreateRoadmapForm(forms.ModelForm):
-    roadmap_title = forms.CharField(max_length=30, required=True)
-    roadmap_description = forms.CharField(max_length=30, required=True)
-
-    class Meta:
-        model = Roadmap
-        fields = ["roadmap_title", "roadmap_description"]

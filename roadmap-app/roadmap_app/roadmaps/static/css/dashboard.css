@@ -150,7 +150,7 @@ body {
 
 
 
-.remove-class button {
+.remove-function button {
     background-color: #ce0000;
     color: rgb(255, 255, 255);
     padding: 8px 15px;
@@ -159,7 +159,7 @@ body {
     cursor: pointer;
 }
 
-.create-project button {
+.create-function button {
     background-color: #007bff;
     color: rgb(255, 255, 255);
     padding: 8px 15px;
@@ -169,7 +169,7 @@ body {
     cursor: pointer;
 }
 
-.create-project input {
+.create-function input {
     width: 100%;
     padding: 5px;
     margin: 5px 0px;

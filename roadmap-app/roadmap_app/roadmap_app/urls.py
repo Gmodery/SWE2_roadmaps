@@ -25,13 +25,14 @@ urlpatterns = [
     path("signup/", views.signup_view, name="signup"),
     path("pages/dashboard", views.dashboard, name="dashboard"),
     path("pages/logout", views.logout_view, name="logout"),
-    path("pages/dashboard/create-roadmap", views.create_roadmap_form, name="create_roadmap"),
     path("pages/dashboard/join-class", views.join_class_view, name="join_class"),
     path('pages/dashboard/class/<int:class_id>/', views.class_detail_view, name='class_detail'),
     path('pages/dashboard/remove-class/<int:class_id>/', views.class_delete_view, name='class_delete'),
     path('pages/dashboard/create-project/<int:class_id>/', views.create_project_view, name='project-create'),
     path('pages/dashboard/class/<int:class_id>/project/<int:project_id>/', views.project_details_view, name='project-details'),
-    path('pages/dashboard/class/<int:class_id>/project/<int:project_id>/<int:roadmap_id>/', views.roadmap_details_view, name='project-details'),
+    path('pages/dashboard/class/<int:class_id>/project/<int:project_id>/delete', views.delete_project_view, name='project-delete'),
+    path('pages/dashboard/class/<int:class_id>/project/<int:project_id>/create-roadmaps', views.create_roadmap_view, name='roadmap-create'),
+    path('pages/dashboard/class/<int:class_id>/project/<int:project_id>/<int:roadmap_id>/', views.roadmap_details_view, name='roadmap-details'),
     path('pages/dashboard/account', views.account_detail_view, name='account')
 ]
 

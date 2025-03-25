@@ -1,11 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, JsonResponse
 from .models import Roadmap, AppUser, Class, Project
 from django.contrib.auth.models import User
-import json
 from collections import defaultdict
-import random, string
 from django.urls import reverse
+import random, string
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .forms import SignUpForm, CreateClassForm, CreateProjectForm
@@ -163,12 +161,12 @@ def dashboard(request):
 
 # Create roadmap page
 @login_required(login_url='login')
-def create_roadmap_form(request):
+def create_roadmap_view(request, class_id, project_id):
     if request.session["usertype"] == "student":
         return redirect("dashboard")
-    
-    class_id = 6 # Replace this with class ID selected from previous page
+
     class_instance = Class.objects.get(id=class_id)
+    project_instance = Project.objects.get(id=project_id)
 
     if request.method == "POST":
         roadmap_title = request.POST.get('roadmap_title')
@@ -309,6 +307,13 @@ def project_details_view(request, class_id, project_id):
 
     return render(request, "roadmaps/pages/project_details.html", {"student": request.session['usertype'] == "student", "class_instance": class_instance,
                                                                    "project_instance": project_instance, "roadmaps": roadmaps})
+
+
+
+def delete_project_view(request, class_id, project_id):
+    Project.objects.get(id=project_id).delete()
+    return redirect(reverse('class_detail', kwargs={'class_id': class_id}))
+
 
 
 @login_required(login_url='login')
