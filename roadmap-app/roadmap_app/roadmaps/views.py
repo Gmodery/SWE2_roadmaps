@@ -270,6 +270,7 @@ def create_project_view(request, class_id):
         return redirect("dashboard")
 
 
+@login_required(login_url='login')
 def project_details_view(request, class_id, project_id):
     class_instance = Class.objects.get(id=class_id)
     project_instance = Project.objects.get(id=project_id)
@@ -287,7 +288,7 @@ def project_details_view(request, class_id, project_id):
         roadmaps = []
 
         for roadmap in all_maps:
-            if current_student in roadmap.class_student.all():
+            if current_student in roadmap.roadmap_students.all():
                 roadmaps.append(roadmap)
 
 
@@ -300,10 +301,7 @@ def project_details_view(request, class_id, project_id):
         # If instructor, able to view all roadmaps for this project
         roadmaps = Roadmap.objects.filter(parent_project=project_instance)
         
-
-    
-
-
+    print(class_instance.id, project_instance.id, roadmaps[0].id)
 
     return render(request, "roadmaps/pages/project_details.html", {"student": request.session['usertype'] == "student", "class_instance": class_instance,
                                                                    "project_instance": project_instance, "roadmaps": roadmaps})
@@ -332,7 +330,11 @@ def account_detail_view(request):
 
 
 @login_required(login_url='login')
-def roadmap_details_view(request):
+def roadmap_details_view(request, class_id, project_id, roadmap_id):
+    roadmap_instance = Roadmap.objects.get(id=roadmap_id)
+
+    return render(request, "roadmaps/pages/roadmap.html", {"roadmap_instance": roadmap_instance, "user": request.session['username']})
+
     if request.method == "POST":
         pass
 
