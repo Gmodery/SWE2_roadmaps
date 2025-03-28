@@ -53,16 +53,22 @@ class Roadmap(models.Model):
     roadmap_description = models.TextField()
     roadmap_students = models.ManyToManyField(AppUser) # One student can have many roadmaps, and one roadmap can have many students
     parent_project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
+    deadline = models.DateField(auto_now_add=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
-    metadata = models.JSONField(default=dict)
 
     def __str__(self):
         return self.roadmap_title
 
 
+class RoadmapSection(models.Model):
+    pass
+
+
 class TaskCategory(models.Model):
-    name = models.CharField(max_length=50)
+    cat_name = models.CharField(max_length=50)
+    cat_color = models.CharField(max_length=6, default="ffffff", null=False) # Hex code (minus the #)
+
+    cat_roadmap = models.ForeignKey(Roadmap, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return self.name

@@ -1,17 +1,17 @@
 .roadmap {
     background-color: rgba(255, 255, 255, 1);
     display: flex;
-    padding-left: 80px;
-    padding-top: 12px;
-    padding-bottom: 44px;
     flex-direction: column;
+    height: 100vh;
+    /* Full viewport height */
     overflow: hidden;
-    align-items: start;
+    /* Prevent page scroll */
+    padding: 12px 80px 44px 80px;
 }
 
 @media (max-width: 991px) {
     .roadmap {
-        padding-left: 20px;
+        padding: 12px 20px;
     }
 }
 
@@ -224,16 +224,18 @@
 /* Milestones Section */
 .milestones-section {
     display: flex;
-    margin-top: 33px;
-    margin-left: 25px;
-    align-items: stretch;
-    gap: 17px;
+    align-items: center;
+    /* Ensures the title and bar are in the same row */
+    gap: 10px;
+    /* Adds spacing */
     font-family: Istok Web, -apple-system, Roboto, Helvetica, sans-serif;
     font-size: 19px;
     color: rgba(240, 236, 255, 1);
     font-weight: 700;
     white-space: nowrap;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    margin-top: 15px;
+    /* Prevent wrapping */
 }
 
 @media (max-width: 991px) {
@@ -261,34 +263,49 @@
 
 .milestones-bar {
     background-color: rgba(217, 217, 217, 1);
-    display: flex;
-    width: 935px;
-    flex-shrink: 0;
-    max-width: 100%;
+    margin-left: 20px;
+    flex-grow: 1;
+    /* Extends to fill remaining space */
     height: 41px;
 }
 
 /* Roadmap Content */
+.roadmap-container {
+    display: flex;
+    flex-grow: 1;
+    overflow-y: auto;
+    /* Enables scrolling */
+    overflow-x: hidden;
+    height: calc(100vh - 160px);
+    /* Adjust height */
+}
+
+
 .roadmap-content {
     display: flex;
-    margin-top: 21px;
-    margin-left: 24px;
-    align-items: stretch;
-    gap: 16px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    /* Stack elements vertically */
+    gap: 10px;
+    /* Adds spacing between milestones and content */
+    flex-grow: 1;
+    overflow: hidden;
 }
 
 /* Category Sidebar */
 .category-sidebar {
-    display: flex;
-    flex-direction: column;
+    flex-shrink: 0;
+    /* overflow-y: auto; */
+    max-height: 100%;
+    /* Ensure sidebar is scrollable if needed */
 }
 
 .category {
     display: flex;
     width: 162px;
     flex-shrink: 0;
-    height: 100px;
+    height: 104px;
+    background-color: rgb(0, 0, 0);
+    margin-bottom: 29px;
 }
 
 .category-blue {
@@ -328,9 +345,13 @@
 /* Roadmap Grid */
 .roadmap-grid {
     flex-grow: 1;
-    flex-shrink: 0;
+    flex-shrink: 1;
     flex-basis: 0;
     width: fit-content;
+    height: 100%;
+    /* Ensure it fills the available height */
+    overflow: auto;
+    /* Enable scrolling */
 }
 
 @media (max-width: 991px) {
@@ -342,13 +363,16 @@
 .grid-row {
     background-color: rgba(217, 217, 217, 0.43);
     display: flex;
-    width: 935px;
-    max-width: 100%;
+    width: max-content;
+    flex-grow: 1;
+    min-width: 100%;
+    /* Ensure content determines width */
     padding: 1px 69px;
     align-items: start;
     gap: 40px 94px;
     flex-wrap: wrap;
     margin-bottom: 7px;
+    margin-left: 27px;
 }
 
 @media (max-width: 991px) {
@@ -481,4 +505,126 @@
 
 .grid-row:nth-child(10) .empty-item:nth-child(3) {
     width: 167px;
+}
+
+
+
+/* Popup Buttons */
+.category-button {
+    margin-top: 9px;
+    cursor: pointer;
+    background-color: #007BFF;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    font-size: 16px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.task-button {
+    margin-top: 9px;
+    cursor: pointer;
+    background-color: #007BFF;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    font-size: 16px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.roadmap-settings-button {
+    margin-top: 9px;
+    cursor: pointer;
+    background-color: #007BFF;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    font-size: 16px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.button-divider {
+    margin-top: 10px;
+}
+
+/* Popup styles */
+.popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.popup hr {
+    border: 0;
+    height: 2px;
+    background-color: #D9D9D9;
+    margin: 20px 0;
+}
+
+.popup-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    max-width: 400px;
+    width: 100%;
+    position: relative;
+}
+
+.popup-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/* When the checkbox is checked, show the popup */
+#popup-toggle-category:checked~#popup-category,
+#popup-toggle-task:checked~#popup-task,
+#popup-toggle-roadmap:checked~#popup-roadmap {
+    display: flex;
+}
+
+/* Style for the form inside the popup */
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="color"],
+input[type="date"],
+textarea {
+    margin-bottom: 15px;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button {
+    padding: 10px;
+    font-size: 16px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #218838;
 }
