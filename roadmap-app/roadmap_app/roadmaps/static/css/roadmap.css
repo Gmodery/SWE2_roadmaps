@@ -546,6 +546,18 @@
     text-align: center;
 }
 
+.section-settings-button {
+    margin-top: 9px;
+    cursor: pointer;
+    background-color: #007BFF;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    font-size: 16px;
+    border-radius: 5px;
+    text-align: center;
+}
+
 .button-divider {
     margin-top: 10px;
 }
@@ -579,6 +591,15 @@
     position: relative;
 }
 
+.popup-content-sections {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    max-width: 600px;
+    width: 100%;
+    position: relative;
+}
+
 .popup-close {
     position: absolute;
     top: 10px;
@@ -587,7 +608,9 @@
     cursor: pointer;
 }
 
+
 /* When the checkbox is checked, show the popup */
+#popup-toggle-section:checked~#popup-section,
 #popup-toggle-category:checked~#popup-category,
 #popup-toggle-task:checked~#popup-task,
 #popup-toggle-roadmap:checked~#popup-roadmap {

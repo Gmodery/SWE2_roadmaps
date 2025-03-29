@@ -61,7 +61,13 @@ class Roadmap(models.Model):
 
 
 class RoadmapSection(models.Model):
-    pass
+    parent_roadmap = models.ForeignKey(Roadmap, on_delete=models.CASCADE, null=True)
+    section_name = models.CharField(max_length=50, default="Section", null=True)
+    start_date = models.DateField(null=True)
+    end_date = models.DateField(null=True)
+
+    def __str__(self):
+        return f"Section for {self.parent_roadmap} | {self.start_date} - {self.end_date}"
 
 
 class TaskCategory(models.Model):

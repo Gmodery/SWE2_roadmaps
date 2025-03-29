@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Roadmap, AppUser, Class, Project, Task, TaskCategory
+from .models import Roadmap, AppUser, Class, Project, Task, TaskCategory, RoadmapSection
 from django.contrib.auth.models import User
 from collections import defaultdict
 from django.urls import reverse
@@ -333,8 +333,10 @@ def account_detail_view(request):
 def roadmap_details_view(request, class_id, project_id, roadmap_id):
     roadmap_instance = Roadmap.objects.get(id=roadmap_id)
     categories = TaskCategory.objects.filter(cat_roadmap=roadmap_instance)
+    sections = sorted(RoadmapSection.objects.filter(parent_roadmap=roadmap_instance), key=lambda section: section.start_date)
 
-    return render(request, "roadmaps/pages/roadmap.html", {"roadmap_instance": roadmap_instance, "categories": categories, "user": request.session['username']})
+
+    return render(request, "roadmaps/pages/roadmap.html", {"roadmap_instance": roadmap_instance, "categories": categories, "sections": sections, "user": request.session['username']})
 
     if request.method == "POST":
         pass

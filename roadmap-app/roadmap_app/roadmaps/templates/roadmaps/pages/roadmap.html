@@ -40,6 +40,10 @@
                 <label class="task-button" for="popup-toggle-task">Add Task</label>
                 <div class="button-divider"></div>
                 
+                <!-- Roadmap Sections Button -->
+                <label class="section-settings-button" for="popup-toggle-section">Section Settings</label>
+                <div class="button-divider"></div>
+
                 <!-- Roadmap Settings Button -->
                 <label class="roadmap-settings-button" for="popup-toggle-roadmap">Roadmap Settings</label>
                 <div class="button-divider"></div>
@@ -48,12 +52,14 @@
                 <input type="checkbox" id="popup-toggle-category" class="popup-toggle" hidden>
                 <input type="checkbox" id="popup-toggle-task" class="popup-toggle" hidden>
                 <input type="checkbox" id="popup-toggle-roadmap" class="popup-toggle" hidden>
+                <input type="checkbox" id="popup-toggle-section" class="popup-toggle" hidden>
                 
                 <!-- Popup for Add Category -->
                 <div class="popup" id="popup-category">
                     <div class="popup-content">
                         <label class="popup-close" for="popup-toggle-category">&times;</label>
                         <form action="#">
+                            {% csrf_token %}
                             <h2>Add Category</h2>
                             <label for="category-name">Category Name:</label>
                             <input type="text" id="category-name" name="category-name" required>
@@ -71,6 +77,7 @@
                     <div class="popup-content">
                         <label class="popup-close" for="popup-toggle-task">&times;</label>
                         <form action="#">
+                            {% csrf_token %}
                             <h2>Add Task</h2>
                             <label for="task-name">Task Name:</label>
                             <input type="text" id="task-name" name="task-name" required>
@@ -88,6 +95,7 @@
                     <div class="popup-content">
                         <label class="popup-close" for="popup-toggle-roadmap">&times;</label>
                         <form action="#">
+                            {% csrf_token %}
                             <h2>Roadmap Settings</h2>
                             <label for="roadmap-title">Roadmap Title:</label>
                             <input type="text" id="roadmap-title" name="roadmap-title" value="{{ roadmap_instance.roadmap_title }}" required>
@@ -99,19 +107,47 @@
                             <input type="date" id="roadmap-deadline" name="roadmap-deadline" value="{{ roadmap_instance.deadline|date:'Y-m-d' }}" required>
 
                             <button type="submit">Save Settings</button>
-
-                            <hr>
-                        </form>
-
-                        <form action="#">
-                            <h2>Section Settings</h2>
-                            
-
-
                         </form>
                     </div>
                 </div>
 
+                <!-- Popup for Section Settings -->
+                <div class="popup" id="popup-section">
+                    <div class="popup-content-sections">
+                        <label class="popup-close" for="popup-toggle-section">&times;</label>
+                        <form action="#">
+                            {% csrf_token %}
+                            <h2>Section Settings</h2>
+                
+                            {% for section in sections %}
+                
+                                <div class="section">
+                                    <label for="section-name"></label>
+                                    <input type="text" id="section-name-{{ forloop.counter }}" name="section-name-{{ forloop.counter }}"
+                                        value="{{ roadmap_instance.section.section_name }}" required>
+                    
+                                    <label for="start-date-{{ forloop.counter }}">Start Date:</label>
+                                    <input type="date" id="start-date-{{ forloop.counter }}" value="{{ section.start_date|date:'Y-m-d' }}" name="start_date[]" required>
+                    
+                                    <label for="end-date-{{ forloop.counter }}">End Date:</label>
+                                    <input type="date" id="end-date-{{ forloop.counter }}" value="{{ section.end_date|date:'Y-m-d' }}" name="end_date[]" required>
+                                
+                                    
+                                </div>
+                
+                            {% endfor %}
+                                
+                            <div>
+                                <button type="submit">Save Settings</button>
+                                <form action="#">
+                                    <button type="submit">Add Section</button>
+                                </form>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
             </div>
         </nav>
 
