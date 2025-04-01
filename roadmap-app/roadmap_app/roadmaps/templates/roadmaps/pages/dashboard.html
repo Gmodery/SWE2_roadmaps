@@ -15,9 +15,9 @@
 
         <!-- Sidebar Navigation -->
         <div class="sidebar">
-            <h2>Dashboard</h2>
+            <h2>Home</h2>
             <ul>
-                <li><a href="{% url 'dashboard' %}">Home</a></li>
+                <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
                 <li><a href="{% url 'account' %}">Account</a></li>
                 <li><a href="{% url 'logout' %}">Logout</a></li>
             </ul>
@@ -61,7 +61,12 @@
 
         <!-- Main Dashboard Content -->
         <div class="main-content">
-            <h1>Your Courses</h1>
+            <h1 class="main-header">Dashboard</h1>
+            <hr class="section-divider">
+
+            <h2 class="section-header">Classes</h2>
+            <hr class="section-divider">
+
             <div class="course-grid">
                 {% for class_instance in classes %}
                 <a href="{% url 'class_detail' class_instance.id %}" class="course-card">
@@ -74,6 +79,8 @@
                 <p>No classes available.</p>
                 {% endfor %}
             </div>
+            <h2 class="section-header">Roadmaps</h2>
+            <hr class="section-divider">
         </div>
 
     </div>

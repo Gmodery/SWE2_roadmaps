@@ -1,11 +1,21 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    background: linear-gradient(
+    -28.61deg,rgba(164, 246, 255, 1) 0%,rgb(0, 58, 64) 100%);
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
 }
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    border: none;
+    overflow: hidden;
+  }
 
 .login-container,
 .dashboard-container {
@@ -26,7 +36,7 @@ input {
 }
 
 button {
-    background: #007bff;
+    background: #4b9334;
     color: white;
     padding: 10px 20px;
     border: none;
@@ -36,7 +46,7 @@ button {
 }
 
 button:hover {
-    background: #0056b3;
+    background: #418a31;
 }
 
 a {
