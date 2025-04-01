@@ -33,7 +33,13 @@ urlpatterns = [
     path('pages/dashboard/class/<int:class_id>/project/<int:project_id>/delete', views.delete_project_view, name='project-delete'),
     path('pages/dashboard/class/<int:class_id>/project/<int:project_id>/create-roadmaps', views.create_roadmap_view, name='roadmap-create'),
     path('pages/dashboard/class/<int:class_id>/project/<int:project_id>/<int:roadmap_id>/', views.roadmap_details_view, name='roadmap-details'),
-    path('pages/dashboard/account', views.account_detail_view, name='account')
+    path('pages/dashboard/account', views.account_detail_view, name='account'),
+    path('pages/dashboard/class/<int:class_id>/project/<int:project_id>/<int:roadmap_id>/add-section/', views.add_section_view, name='add_roadmap_section'),
+    path('pages/dashboard/class/<int:class_id>/project/<int:project_id>/<int:roadmap_id>/save-sections/', views.save_sections_view, name='save_sections'),
+    path('pages/dashboard/class/<int:class_id>/project/<int:project_id>/<int:roadmap_id>/delete-section/<int:section_id>', views.remove_section_view, name='delete_section'),
+
+
+
 ]
 
 # Path syntax: path(URL route pattern (not necessarily path within templates, just url to follow in browser to get to view), 

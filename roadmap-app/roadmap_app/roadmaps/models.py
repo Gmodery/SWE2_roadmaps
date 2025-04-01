@@ -53,16 +53,30 @@ class Roadmap(models.Model):
     roadmap_description = models.TextField()
     roadmap_students = models.ManyToManyField(AppUser) # One student can have many roadmaps, and one roadmap can have many students
     parent_project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
+    deadline = models.DateField(auto_now_add=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
-    metadata = models.JSONField(default=dict)
 
     def __str__(self):
         return self.roadmap_title
 
 
+class RoadmapSection(models.Model):
+    parent_roadmap = models.ForeignKey(Roadmap, on_delete=models.CASCADE, null=True)
+    section_name = models.CharField(max_length=50, default="Section", null=True)
+    start_date = models.DateField(null=True)
+    end_date = models.DateField(null=True)
+    width_percentage = models.FloatField(null=True)
+    start_percent = models.FloatField(null=True)
+
+    def __str__(self):
+        return f"Section for {self.parent_roadmap} | {self.start_date} - {self.end_date}"
+
+
 class TaskCategory(models.Model):
-    name = models.CharField(max_length=50)
+    cat_name = models.CharField(max_length=50)
+    cat_color = models.CharField(max_length=6, default="ffffff", null=False) # Hex code (minus the #)
+
+    cat_roadmap = models.ForeignKey(Roadmap, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return self.name
@@ -84,6 +98,9 @@ class Task(models.Model):
     category = models.ForeignKey(TaskCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name="task_cat")
     start_time = models.DateField()
     end_time = models.DateField()
+
+    width_percentage = models.FloatField(null=True)
+    start_percent = models.FloatField(null=True)
 
     def __str__(self):
         return self.task_name

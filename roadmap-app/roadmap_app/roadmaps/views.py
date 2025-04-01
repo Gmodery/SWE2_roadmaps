@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Roadmap, AppUser, Class, Project
+from .models import Roadmap, AppUser, Class, Project, Task, TaskCategory, RoadmapSection
 from django.contrib.auth.models import User
 from collections import defaultdict
 from django.urls import reverse
 import random, string
+from datetime import date, datetime
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .forms import SignUpForm, CreateClassForm, CreateProjectForm
@@ -270,6 +271,7 @@ def create_project_view(request, class_id):
         return redirect("dashboard")
 
 
+@login_required(login_url='login')
 def project_details_view(request, class_id, project_id):
     class_instance = Class.objects.get(id=class_id)
     project_instance = Project.objects.get(id=project_id)
@@ -287,7 +289,7 @@ def project_details_view(request, class_id, project_id):
         roadmaps = []
 
         for roadmap in all_maps:
-            if current_student in roadmap.class_student.all():
+            if current_student in roadmap.roadmap_students.all():
                 roadmaps.append(roadmap)
 
 
@@ -300,10 +302,7 @@ def project_details_view(request, class_id, project_id):
         # If instructor, able to view all roadmaps for this project
         roadmaps = Roadmap.objects.filter(parent_project=project_instance)
         
-
-    
-
-
+    print(class_instance.id, project_instance.id, roadmaps[0].id)
 
     return render(request, "roadmaps/pages/project_details.html", {"student": request.session['usertype'] == "student", "class_instance": class_instance,
                                                                    "project_instance": project_instance, "roadmaps": roadmaps})
@@ -330,9 +329,16 @@ def account_detail_view(request):
     return render(request, "roadmaps/pages/account_details.html", {"username": username, "user_type": user_type, "full_name": full_name, "email": email, "date_joined": date_joined, "student": user_type=="Student"})
 
 
-
+# -------- Roadmap Views -------------
 @login_required(login_url='login')
-def roadmap_details_view(request):
+def roadmap_details_view(request, class_id, project_id, roadmap_id):
+    roadmap_instance = Roadmap.objects.get(id=roadmap_id)
+    categories = TaskCategory.objects.filter(cat_roadmap=roadmap_instance)
+    sections = sorted(RoadmapSection.objects.filter(parent_roadmap=roadmap_instance), key=lambda section: section.start_date)
+
+
+    return render(request, "roadmaps/pages/roadmap.html", {"roadmap_instance": roadmap_instance, "categories": categories, "sections": sections, "user": request.session['username'], "class_id": class_id, "project_id": project_id})
+
     if request.method == "POST":
         pass
 
@@ -344,8 +350,67 @@ def roadmap_details_view(request):
     elif request.session["usertype"] == "instructor":
         return redirect("dashboard")
 
-    
 
+@login_required(login_url='login')
+def add_section_view(request, class_id, project_id, roadmap_id):
+    roadmap_instance = Roadmap.objects.get(id=roadmap_id)
+    categories = TaskCategory.objects.filter(cat_roadmap=roadmap_instance)
+        
+
+    if request.method == "POST":
+        if "add_section" in request.POST:
+            new_section = RoadmapSection(parent_roadmap=roadmap_instance, section_name="New Section", start_date=date.today(), end_date=date.today())
+            new_section.save()
+
+    sections = sorted(RoadmapSection.objects.filter(parent_roadmap=roadmap_instance), key=lambda section: section.start_date)
+
+    return render(request, "roadmaps/pages/roadmap.html", {"roadmap_instance": roadmap_instance, "categories": categories, "sections": sections, "user": request.session['username'], "class_id": class_id, "project_id": project_id})
+
+
+def save_sections_view(request, class_id, project_id, roadmap_id):
+    if request.method == "POST":
+        roadmap_instance = Roadmap.objects.get(id=roadmap_id)
+
+        section_ids = [int(x) for x in request.POST.getlist("section_id[]")]
+        section_names = request.POST.getlist("section_name[]")
+        start_dates = request.POST.getlist("start_date[]")
+        end_dates = request.POST.getlist("end_date[]")
+
+        first_start_date = datetime.strptime(min(start_dates), "%Y-%m-%d").date()
+        total_duration = (roadmap_instance.deadline - first_start_date).days
+
+        for i, section_id in enumerate(section_ids):
+            section = RoadmapSection.objects.get(id=section_id)
+            section.section_name = section_names[i]
+            section.start_date = start_dates[i]
+            section.end_date = end_dates[i]
+            section.start_percent = ((datetime.strptime(section.start_date, "%Y-%m-%d").date() - first_start_date).days / total_duration) * 100
+            section.width_percentage = ((datetime.strptime(section.end_date, "%Y-%m-%d").date() - datetime.strptime(section.start_date, "%Y-%m-%d").date()).days) / total_duration * 100
+
+            section.save()
+
+
+        
+        categories = TaskCategory.objects.filter(cat_roadmap=roadmap_instance)
+        sections = sorted(RoadmapSection.objects.filter(parent_roadmap=roadmap_instance), key=lambda section: section.start_date)
+        
+        return render(request, "roadmaps/pages/roadmap.html", {"roadmap_instance": roadmap_instance, "categories": categories, "sections": sections, "user": request.session['username'], "class_id": class_id, "project_id": project_id})
+
+
+
+def remove_section_view(request, class_id, project_id, roadmap_id, section_id):
+    roadmap_instance = Roadmap.objects.get(id=roadmap_id)
+    categories = TaskCategory.objects.filter(cat_roadmap=roadmap_instance)
+
+    if request.method == "POST":
+        try:
+            RoadmapSection.objects.get(id=section_id).delete()
+        except:
+            pass
+
+    sections = sorted(RoadmapSection.objects.filter(parent_roadmap=roadmap_instance), key=lambda section: section.start_date)
+
+    return render(request, "roadmaps/pages/roadmap.html", {"roadmap_instance": roadmap_instance, "categories": categories, "sections": sections, "user": request.session['username'], "class_id": class_id, "project_id": project_id})
 
 # render function syntax: 
 # render(HTTP request object, 

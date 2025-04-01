@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>{{ project_instance.project_title }}</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 </head>
@@ -35,11 +35,12 @@
 
             <div class="course-grid">
                 {% for roadmap in roadmaps %}
-                    <a href="{% url 'roadmap-details' class_instance_id project.id roadmap.id %}" class="course-card">
+                    <a href="{% url 'roadmap-details' class_instance.id project_instance.id roadmap.id %}" class="course-card">
                         <h2>{{ roadmap.roadmap_title }}</h2>
                         <p>{{ roadmap.roadmap_description }}</p>
+                        
 
-                            {% for student in roadmap.roadmap_students %}
+                            {% for student in roadmap.roadmap_students.all %}
                                 <p>{{ student.first_name }} {{ student.last_name }},</p>
                             {% endfor %}
                     </a>

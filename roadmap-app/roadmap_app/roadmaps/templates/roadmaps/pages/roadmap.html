@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ roadmap_instance.roadmap_title }}</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/roadmap.css' %}">
+</head>
+
+<body>
+    <main class="roadmap">
+        <header class="roadmap-header">
+            <h1 class="project-title">{{ roadmap_instance.roadmap_title }}</h1>
+            <div class="user-profile">
+                <span class="user-name">{{ username }}</span>
+            </div>
+        </header>
+
+        <nav class="navigation-bar">
+            <div class="nav-tabs">
+                <!-- Swap views -->
+                <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/73833c284f731daf35addacab74283d2784de5ae?placeholderIfAbsent=true&apiKey=8ead13b4ddd046e79356c2b1a32d18fb"
+                    alt="Items icon" class="items-icon" />
+                <span class="items-tab">Items</span>
+                <div class="tab-divider"></div>
+                <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/6051d654cac384583745dd39fc660703a5cd30b0?placeholderIfAbsent=true&apiKey=8ead13b4ddd046e79356c2b1a32d18fb"
+                    alt="Timeline icon" class="timeline-icon" />
+                <span class="timeline-tab">Timeline</span>
+
+            </div>
+            <div class="action-buttons">
+                <!-- Add Category Button -->
+                <label class="category-button" for="popup-toggle-category">Add Category</label>
+                <div class="button-divider"></div>
+                
+                <!-- Add Task Button -->
+                <label class="task-button" for="popup-toggle-task">Add Task</label>
+                <div class="button-divider"></div>
+                
+                <!-- Roadmap Sections Button -->
+                <label class="section-settings-button" for="popup-toggle-section">Section Settings</label>
+                <div class="button-divider"></div>
+
+                <!-- Roadmap Settings Button -->
+                <label class="roadmap-settings-button" for="popup-toggle-roadmap">Roadmap Settings</label>
+                <div class="button-divider"></div>
+                
+                <!-- Hidden checkboxes to toggle popups -->
+                <input type="checkbox" id="popup-toggle-category" class="popup-toggle" hidden>
+                <input type="checkbox" id="popup-toggle-task" class="popup-toggle" hidden>
+                <input type="checkbox" id="popup-toggle-roadmap" class="popup-toggle" hidden>
+                <input type="checkbox" id="popup-toggle-section" class="popup-toggle" hidden>
+                
+                <!-- Popup for Add Category -->
+                <div class="popup" id="popup-category">
+                    <div class="popup-content">
+                        <label class="popup-close" for="popup-toggle-category">&times;</label>
+                        <form action="#">
+                            {% csrf_token %}
+                            <h2>Add Category</h2>
+                            <label for="category-name">Category Name:</label>
+                            <input type="text" id="category-name" name="category-name" required>
+                
+                            <label for="category-color">Category Color:</label>
+                            <input type="color" id="category-color" name="category-color" required>
+                
+                            <button type="submit">Submit</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Popup for Add Task -->
+                <div class="popup" id="popup-task">
+                    <div class="popup-content">
+                        <label class="popup-close" for="popup-toggle-task">&times;</label>
+                        <form action="#">
+                            {% csrf_token %}
+                            <h2>Add Task</h2>
+                            <label for="task-name">Task Name:</label>
+                            <input type="text" id="task-name" name="task-name" required>
+                
+                            <label for="task-desc">Task Description:</label>
+                            <textarea id="task-desc" name="task-desc" required></textarea>
+                
+                            <button type="submit">Submit</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Popup for Roadmap Settings -->
+                <div class="popup" id="popup-roadmap">
+                    <div class="popup-content">
+                        <label class="popup-close" for="popup-toggle-roadmap">&times;</label>
+                        <form action="#">
+                            {% csrf_token %}
+                            <h2>Roadmap Settings</h2>
+                            <label for="roadmap-title">Roadmap Title:</label>
+                            <input type="text" id="roadmap-title" name="roadmap-title" value="{{ roadmap_instance.roadmap_title }}" required>
+                
+                            <label for="roadmap-desc">Roadmap Description:</label>
+                            <textarea id="roadmap-desc" name="roadmap-desc" value="{{ roadmap_instance.roadmap_description }}" required></textarea>
+                
+                            <label for="roadmap-deadline">Project Deadline:</label>
+                            <input type="date" id="roadmap-deadline" name="roadmap-deadline" value="{{ roadmap_instance.deadline|date:'Y-m-d' }}" required>
+
+                            <button type="submit">Save Settings</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Popup for Section Settings -->
+                <div class="popup" id="popup-section">
+                    <div class="popup-content-sections">
+                        <label class="popup-close" for="popup-toggle-section">&times;</label>
+                        <div class="section-form">
+                            <!-- Main Form: Saves all sections -->
+                            <form id="save-form" method="POST" action="{% url 'save_sections' class_id project_id roadmap_instance.id %}">
+                                {% csrf_token %}
+                                <h2>Section Settings</h2>
+                        
+                                {% for section in sections %}
+                                <!-- Wrapper to keep section and delete button aligned -->
+                                <div class="section" style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="hidden" name="section_id[]" value="{{ section.id }}" form="save-form"> <!-- Hidden ID input -->
+                        
+                                    <label for="section-name-{{ forloop.counter }}"></label>
+                                    <input type="text" id="section-name-{{ forloop.counter }}" name="section_name[]"
+                                        value="{{ section.section_name }}" required form="save-form">
+                        
+                                    <label for="start-date-{{ forloop.counter }}">Start Date:</label>
+                                    <input type="date" id="start-date-{{ forloop.counter }}" value="{{ section.start_date|date:'Y-m-d' }}"
+                                        name="start_date[]" required form="save-form">
+                        
+                                    <label for="end-date-{{ forloop.counter }}">End Date:</label>
+                                    <input type="date" id="end-date-{{ forloop.counter }}" value="{{ section.end_date|date:'Y-m-d' }}"
+                                        name="end_date[]" required form="save-form">
+                        
+                                    <!-- Delete Button outside of the main form, but still aligned -->
+                                    <button type="submit" class="button-delete" form="delete-form-{{ section.id }}">X</button>
+                                    <form id="delete-form-{{ section.id }}" method="POST"
+                                        action="{% url 'delete_section' class_id project_id roadmap_instance.id section.id %}">
+                                        {% csrf_token %}
+                                    </form>
+                                </div>
+                                {% endfor %}
+                        
+                                <!-- Buttons inside the form to submit all inputs -->
+                                <div class="button-container" style="display: flex; gap: 10px; margin-top: 10px;">
+                                    <button type="submit" class="button-save" form="save-form">Save Settings</button>
+                                </div>
+                            </form>
+                        
+                            <!-- Separate form for adding a new section -->
+                            <form method="POST" action="{% url 'add_roadmap_section' class_id project_id roadmap_instance.id %}">
+                                {% csrf_token %}
+                                <button type="submit" name="add_section" class="button-add">Add Section</button>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            </div>
+        </nav>
+
+        <section class="roadmap-content">
+            <section class="milestones-section">
+                <h2 class="milestones-title">MILESTONES</h2>
+
+                <div class="milestones-bar">
+                    {% for section in sections %}
+                    <div class="milestone-section"
+                        style="left: {{ section.start_percent }}%; width: {{ section.width_percentage }}%; background-color: {{ section.color }}">
+                        {{ section.section_name }}
+                    </div>
+
+                    {% endfor %}
+                </div>
+
+            </section>
+
+            <section class="roadmap-container">
+
+                <aside class="category-sidebar">
+                    {% for category in categories %}
+                        <div class="category" style="background-color: #{{ category.cat_color }};"></div>
+                    {% endfor %}
+                    
+                        
+                </aside>
+
+                <div class="roadmap-grid">
+                    <!-- Blue category items -->
+                    <div class="grid-row">
+                        <div class="grid-item blue-item"></div>
+                        <div class="grid-group">
+                            <div class="grid-item blue-item"></div>
+                            <div class="grid-item blue-item"></div>
+                        </div>
+                    </div>
+
+                    <div class="grid-row">
+                        <div class="grid-item blue-item"></div>
+                        <div class="grid-item blue-item"></div>
+                    </div>
+
+                    <div class="grid-row">
+                        <div class="grid-group">
+                            <div class="grid-item blue-item"></div>
+                            <div class="grid-item blue-item"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+        </section>
+    </main>
+</body>
+
+</html>

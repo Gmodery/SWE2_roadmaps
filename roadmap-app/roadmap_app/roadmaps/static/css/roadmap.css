@@ -1,0 +1,620 @@
+.roadmap {
+    background-color: rgba(255, 255, 255, 1);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    /* Full viewport height */
+    overflow: hidden;
+    /* Prevent page scroll */
+    padding: 12px 80px 44px 80px;
+}
+
+@media (max-width: 991px) {
+    .roadmap {
+        padding: 12px 20px;
+    }
+}
+
+/* Header Section */
+.roadmap-header {
+    display: flex;
+    margin-left: 14px;
+    width: 100%;
+    max-width: 1164px;
+    align-items: stretch;
+    gap: 20px;
+    color: rgba(0, 0, 0, 1);
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+@media (max-width: 991px) {
+    .roadmap-header {
+        max-width: 100%;
+    }
+}
+
+.project-title {
+    font-size: 19px;
+    font-family: Instrument Sans, -apple-system, Roboto, Helvetica, sans-serif;
+    font-weight: 600;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.user-profile {
+    display: flex;
+    align-items: stretch;
+    gap: 15px;
+    font-weight: 400;
+    white-space: nowrap;
+}
+
+@media (max-width: 991px) {
+    .user-profile {
+        white-space: initial;
+    }
+}
+
+.avatar-image {
+    aspect-ratio: 0.94;
+    object-fit: contain;
+    object-position: center;
+    width: 34px;
+    margin-top: auto;
+    margin-bottom: auto;
+    flex-shrink: 0;
+}
+
+.user-badge {
+    background-color: rgba(170, 67, 49, 1);
+    border-radius: 50%;
+    padding-left: 13px;
+    padding-right: 13px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+    font-size: 30px;
+}
+
+@media (max-width: 991px) {
+    .user-badge {
+        white-space: initial;
+    }
+}
+
+.user-name {
+    font-size: 24px;
+    font-family: Istok Web, -apple-system, Roboto, Helvetica, sans-serif;
+    align-self: start;
+}
+
+/* Navigation Bar */
+.navigation-bar {
+    background-color: rgba(217, 217, 217, 1);
+    align-self: stretch;
+    display: flex;
+    margin-top: 6px;
+    width: 100%;
+    padding-left: 14px;
+    padding-right: 80px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    align-items: stretch;
+    gap: 20px;
+    color: rgba(0, 0, 0, 1);
+    white-space: nowrap;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+@media (max-width: 991px) {
+    .navigation-bar {
+        padding-right: 20px;
+        white-space: initial;
+    }
+}
+
+.nav-tabs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: Istok Web, -apple-system, Roboto, Helvetica, sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+@media (max-width: 991px) {
+    .nav-tabs {
+        white-space: initial;
+    }
+}
+
+.items-icon {
+    aspect-ratio: 1.31;
+    object-fit: contain;
+    object-position: center;
+    width: 34px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    align-self: stretch;
+    margin-top: auto;
+    margin-bottom: auto;
+    flex-shrink: 0;
+}
+
+.items-tab {
+    align-self: stretch;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.tab-divider {
+    border-color: rgba(0, 0, 0, 1);
+    align-self: start;
+    width: 0px;
+    flex-shrink: 0;
+    height: 47px;
+}
+
+.timeline-icon {
+    aspect-ratio: 1.17;
+    object-fit: contain;
+    object-position: center;
+    width: 34px;
+    align-self: stretch;
+    margin-top: auto;
+    margin-bottom: auto;
+    flex-shrink: 0;
+}
+
+.timeline-tab {
+    align-self: stretch;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.action-buttons {
+    display: flex;
+    align-items: flex-start;
+    gap: 17px;
+    font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+@media (max-width: 991px) {
+    .action-buttons {
+        white-space: initial;
+    }
+}
+
+.item-button {
+    border-radius: 5px;
+    background-color: rgba(217, 217, 217, 1);
+    border-color: rgba(0, 0, 0, 1);
+    border-style: solid;
+    border-width: 2px;
+    margin-top: auto;
+    margin-bottom: auto;
+    padding-left: 23px;
+    padding-right: 23px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    cursor: pointer;
+}
+
+@media (max-width: 991px) {
+    .item-button {
+        padding-left: 20px;
+        white-space: initial;
+    }
+}
+
+.button-divider {
+    border-color: rgba(0, 0, 0, 1);
+    align-self: start;
+    width: 0px;
+    flex-shrink: 0;
+    height: 47px;
+}
+
+/* Milestones Section */
+.milestones-section {
+    display: flex;
+    align-items: center;
+    /* Ensures the title and bar are in the same row */
+    gap: 10px;
+    /* Adds spacing */
+    font-family: Istok Web, -apple-system, Roboto, Helvetica, sans-serif;
+    font-size: 19px;
+    color: rgb(243, 243, 243);
+    font-weight: 700;
+    white-space: nowrap;
+    flex-wrap: nowrap;
+    margin-top: 15px;
+    /* Prevent wrapping */
+}
+
+@media (max-width: 991px) {
+    .milestones-section {
+        white-space: initial;
+    }
+}
+
+.milestones-title {
+    background-color: rgba(70, 156, 175, 1);
+    padding-left: 19px;
+    padding-right: 19px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    margin: 0;
+    font-size: inherit;
+    font-weight: inherit;
+}
+
+@media (max-width: 991px) {
+    .milestones-title {
+        white-space: initial;
+    }
+}
+
+.milestones-bar {
+    position: relative;
+    background-color: rgba(217, 217, 217, 1);
+    margin-left: 20px;
+    flex-grow: 1;
+    /* Extends to fill remaining space */
+    height: 41px;
+}
+
+/* Roadmap Content */
+.roadmap-container {
+    display: flex;
+    flex-grow: 1;
+    overflow-y: auto;
+    /* Enables scrolling */
+    overflow-x: hidden;
+    height: calc(100vh - 160px);
+    /* Adjust height */
+}
+
+
+.roadmap-content {
+    display: flex;
+    flex-direction: column;
+    /* Stack elements vertically */
+    gap: 10px;
+    /* Adds spacing between milestones and content */
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+/* Category Sidebar */
+.category-sidebar {
+    flex-shrink: 0;
+    /* overflow-y: auto; */
+    max-height: 100%;
+    /* Ensure sidebar is scrollable if needed */
+}
+
+.category {
+    display: flex;
+    width: 162px;
+    flex-shrink: 0;
+    height: 104px;
+    background-color: rgb(0, 0, 0);
+    margin-bottom: 29px;
+}
+
+.category-blue {
+    background-color: rgba(66, 79, 182, 1);
+}
+
+.category-coral {
+    background-color: rgba(238, 153, 134, 1);
+    margin-top: 29px;
+}
+
+.category-orange {
+    background-color: rgba(234, 103, 63, 1);
+    margin-top: 29px;
+}
+
+.category-teal {
+    background-color: rgba(96, 219, 186, 1);
+    margin-top: 33px;
+    height: 64px;
+}
+
+.category-cyan {
+    background-color: rgba(105, 228, 243, 1);
+    margin-top: 27px;
+    padding-left: 1px;
+    padding-right: 1px;
+}
+
+.category-inner {
+    background-color: rgba(105, 228, 243, 1);
+    display: flex;
+    flex-shrink: 0;
+    height: 100px;
+}
+
+/* Roadmap Grid */
+.roadmap-grid {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+    width: fit-content;
+    height: 100%;
+    /* Ensure it fills the available height */
+    overflow: auto;
+    /* Enable scrolling */
+}
+
+.section-form {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+    width: fit-content;
+    height: 100%;
+    max-height: 400px;
+    /* Ensure it fills the available height */
+    overflow: auto;
+    /* Enable scrolling */
+}
+
+@media (max-width: 991px) {
+    .roadmap-grid {
+        max-width: 100%;
+    }
+}
+
+.grid-row {
+    background-color: rgba(217, 217, 217, 0.43);
+    display: flex;
+    width: max-content;
+    flex-grow: 1;
+    min-width: 100%;
+    /* Ensure content determines width */
+    padding: 1px 69px;
+    align-items: start;
+    gap: 40px 94px;
+    flex-wrap: wrap;
+    margin-bottom: 7px;
+    margin-left: 27px;
+}
+
+@media (max-width: 991px) {
+    .grid-row {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+}
+
+.grid-item {
+    display: flex;
+    height: 28px;
+    flex-shrink: 0;
+}
+
+.grid-group {
+    display: flex;
+    align-items: stretch;
+    gap: 40px 45px;
+    flex-wrap: wrap;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: auto;
+}
+
+/* Item types */
+.blue-item {
+    background-color: rgba(66, 79, 182, 1);
+    width: 196px;
+}
+
+.blue-item:nth-child(2) {
+    width: 298px;
+    max-width: 100%;
+}
+
+.blue-item:nth-child(3) {
+    width: 144px;
+}
+
+/* Popup Buttons */
+.category-button {
+    margin-top: 9px;
+    cursor: pointer;
+    background-color: #007BFF;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    font-size: 16px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.task-button {
+    margin-top: 9px;
+    cursor: pointer;
+    background-color: #007BFF;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    font-size: 16px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.roadmap-settings-button {
+    margin-top: 9px;
+    cursor: pointer;
+    background-color: #007BFF;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    font-size: 16px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.section-settings-button {
+    margin-top: 9px;
+    cursor: pointer;
+    background-color: #007BFF;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    font-size: 16px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.button-divider {
+    margin-top: 10px;
+}
+
+/* Popup styles */
+.popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.popup hr {
+    border: 0;
+    height: 2px;
+    background-color: #D9D9D9;
+    margin: 20px 0;
+}
+
+.popup-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    max-width: 400px;
+    width: 100%;
+    position: relative;
+}
+
+.popup-content-sections {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    max-width: 650px;
+    width: 100%;
+    position: relative;
+}
+
+.popup-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+
+.milestone-section {
+    position: absolute;
+    height: 100%;
+    color: white;
+    text-align: center;
+    font-size: 12px;
+    padding: 5px;
+    border-right: 1px solid #fff;
+    font-size: 20px;
+}
+
+
+/* When the checkbox is checked, show the popup */
+#popup-toggle-section:checked~#popup-section,
+#popup-toggle-category:checked~#popup-category,
+#popup-toggle-task:checked~#popup-task,
+#popup-toggle-roadmap:checked~#popup-roadmap {
+    display: flex;
+}
+
+/* Style for the form inside the popup */
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="color"],
+input[type="date"],
+textarea {
+    margin-bottom: 15px;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button {
+    padding: 10px;
+    font-size: 16px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.button-delete {
+    padding: 10px;
+    margin-bottom: 14px;
+    max-height: 35px;
+    font-size: 16px;
+    background-color: #e21313;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.button-delete:hover {
+    background-color: #c52020;
+}
+
+.button-container {
+    display: flex;
+    gap: 10px;
+    /* Adjust spacing between buttons */
+    margin-top: 10px;
+}
+
+.button-save,
+.button-add {
+    padding: 10px 15px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.button-save {
+    background-color: #007bff;
+    /* Blue */
+    color: white;
+}
+
+button:hover {
+    background-color: #218838;
+}
