@@ -120,6 +120,7 @@
                             <form id="save-form" method="POST" action="{% url 'save_sections' class_id project_id roadmap_instance.id %}">
                                 {% csrf_token %}
                                 <h2>Section Settings</h2>
+                                <h3>Note: Section timelines may not overlap</h3>
                         
                                 {% for section in sections %}
                                 <!-- Wrapper to keep section and delete button aligned -->
@@ -169,31 +170,24 @@
         <section class="roadmap-content">
             <section class="milestones-section">
                 <h2 class="milestones-title">MILESTONES</h2>
-
                 <div class="milestones-bar">
                     {% for section in sections %}
                     <div class="milestone-section"
                         style="left: {{ section.start_percent }}%; width: {{ section.width_percentage }}%;">
                         {{ section.section_name }}
                     </div>
-
                     {% endfor %}
                 </div>
-
             </section>
-
-            <section class="roadmap-container">
-
+        
+            <section class="roadmap-container" style="display: flex;">
                 <aside class="category-sidebar">
                     {% for category in categories %}
-                        <div class="category" style="background-color: #{{ category.cat_color }};"></div>
+                    <div class="category" style="background-color: #{{ category.cat_color }};"></div>
                     {% endfor %}
-                    
-                        
                 </aside>
-
+        
                 <div class="roadmap-grid">
-                    <!-- Blue category items -->
                     <div class="grid-row">
                         <div class="grid-item blue-item"></div>
                         <div class="grid-group">
@@ -201,19 +195,16 @@
                             <div class="grid-item blue-item"></div>
                         </div>
                     </div>
-
                     <div class="grid-row">
                         <div class="grid-item blue-item"></div>
                         <div class="grid-item blue-item"></div>
                     </div>
-
                     <div class="grid-row">
                         <div class="grid-group">
                             <div class="grid-item blue-item"></div>
                             <div class="grid-item blue-item"></div>
                         </div>
                     </div>
-
                 </div>
             </section>
         </section>

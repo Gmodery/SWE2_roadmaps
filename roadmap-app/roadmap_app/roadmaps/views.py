@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from collections import defaultdict
 from django.urls import reverse
 import random, string
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .forms import SignUpForm, CreateClassForm, CreateProjectForm
@@ -356,7 +356,6 @@ def add_section_view(request, class_id, project_id, roadmap_id):
     roadmap_instance = Roadmap.objects.get(id=roadmap_id)
     categories = TaskCategory.objects.filter(cat_roadmap=roadmap_instance)
         
-
     if request.method == "POST":
         if "add_section" in request.POST:
             new_section = RoadmapSection(parent_roadmap=roadmap_instance, section_name="New Section", start_date=date.today(), end_date=date.today())
@@ -364,10 +363,14 @@ def add_section_view(request, class_id, project_id, roadmap_id):
 
     sections = sorted(RoadmapSection.objects.filter(parent_roadmap=roadmap_instance), key=lambda section: section.start_date)
 
+    RoadmapSection.objects.last().start_date = sections[-1].end_date
+
     return render(request, "roadmaps/pages/roadmap.html", {"roadmap_instance": roadmap_instance, "categories": categories, "sections": sections, "user": request.session['username'], "class_id": class_id, "project_id": project_id})
 
 
 def save_sections_view(request, class_id, project_id, roadmap_id):
+    # TODO: Verify that start is before end and that they don't overlap
+
     if request.method == "POST":
         roadmap_instance = Roadmap.objects.get(id=roadmap_id)
 
@@ -379,7 +382,11 @@ def save_sections_view(request, class_id, project_id, roadmap_id):
         first_start_date = datetime.strptime(min(start_dates), "%Y-%m-%d").date()
         total_duration = (roadmap_instance.deadline - first_start_date).days
 
+        # First pass to make updates
         for i, section_id in enumerate(section_ids):
+            if start_dates[i] > end_dates[i]:
+                continue
+
             section = RoadmapSection.objects.get(id=section_id)
             section.section_name = section_names[i]
             section.start_date = start_dates[i]
@@ -390,7 +397,27 @@ def save_sections_view(request, class_id, project_id, roadmap_id):
             section.save()
 
 
-        
+        sections = sorted(RoadmapSection.objects.filter(parent_roadmap=roadmap_instance), key=lambda section: section.start_date)
+
+        # Second pass to fix overlaps
+        for i in range(len(section_ids) - 1):
+            current_section = RoadmapSection.objects.get(id=section_ids[i])
+            next_section = RoadmapSection.objects.get(id=section_ids[i + 1])
+
+            # Ensure sections are properly ordered
+            if current_section.end_date > next_section.start_date:
+                # Shift next section's start date to the day after the current section's end date
+                next_section.start_date = current_section.end_date + timedelta(days=1)
+
+                # Ensure next section's start date doesn't exceed its end date
+                if next_section.start_date > next_section.end_date:
+                    next_section.end_date = next_section.start_date  # Prevent negative duration
+
+                next_section.save()
+
+            current_section.save()
+
+
         categories = TaskCategory.objects.filter(cat_roadmap=roadmap_instance)
         sections = sorted(RoadmapSection.objects.filter(parent_roadmap=roadmap_instance), key=lambda section: section.start_date)
         
