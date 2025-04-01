@@ -230,7 +230,7 @@
     /* Adds spacing */
     font-family: Istok Web, -apple-system, Roboto, Helvetica, sans-serif;
     font-size: 19px;
-    color: rgba(240, 236, 255, 1);
+    color: rgb(243, 243, 243);
     font-weight: 700;
     white-space: nowrap;
     flex-wrap: nowrap;
@@ -262,6 +262,7 @@
 }
 
 .milestones-bar {
+    position: relative;
     background-color: rgba(217, 217, 217, 1);
     margin-left: 20px;
     flex-grow: 1;
@@ -354,6 +355,18 @@
     /* Enable scrolling */
 }
 
+.section-form {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+    width: fit-content;
+    height: 100%;
+    max-height: 400px;
+    /* Ensure it fills the available height */
+    overflow: auto;
+    /* Enable scrolling */
+}
+
 @media (max-width: 991px) {
     .roadmap-grid {
         max-width: 100%;
@@ -412,102 +425,6 @@
 .blue-item:nth-child(3) {
     width: 144px;
 }
-
-.coral-item {
-    background-color: rgba(238, 153, 134, 1);
-    width: 196px;
-}
-
-.coral-item:nth-child(1) {
-    width: 188px;
-}
-
-.coral-item:nth-child(2) {
-    width: 201px;
-}
-
-.coral-item:nth-child(3) {
-    width: 266px;
-    max-width: 100%;
-}
-
-.orange-item {
-    background-color: rgba(234, 103, 63, 1);
-    width: 226px;
-}
-
-.orange-item:nth-child(1) {
-    width: 152px;
-}
-
-.orange-item:nth-child(3) {
-    width: 219px;
-}
-
-.teal-item {
-    background-color: rgba(96, 219, 186, 1);
-    width: 125px;
-}
-
-.teal-item:nth-child(2) {
-    width: 569px;
-    max-width: 100%;
-}
-
-.cyan-item {
-    background-color: rgba(105, 228, 243, 1);
-    width: 212px;
-}
-
-.cyan-item:nth-child(2) {
-    width: 276px;
-    max-width: 100%;
-}
-
-.cyan-item:nth-child(3) {
-    width: 425px;
-    max-width: 100%;
-}
-
-.cyan-item:nth-child(4) {
-    width: 149px;
-}
-
-.empty-item {
-    background-color: rgba(217, 217, 217, 0.43);
-    width: 254px;
-    max-width: 100%;
-}
-
-/* Specific row styles */
-.grid-row:nth-child(2) .blue-item:nth-child(1) {
-    width: 257px;
-    max-width: 100%;
-}
-
-.grid-row:nth-child(2) .blue-item:nth-child(2) {
-    width: 191px;
-}
-
-.grid-row:nth-child(3) .blue-item {
-    width: 196px;
-}
-
-.grid-row:nth-child(6) .coral-item {
-    width: 257px;
-    max-width: 100%;
-}
-
-.grid-row:nth-child(10) .empty-item:nth-child(2) {
-    width: 257px;
-    max-width: 100%;
-}
-
-.grid-row:nth-child(10) .empty-item:nth-child(3) {
-    width: 167px;
-}
-
-
 
 /* Popup Buttons */
 .category-button {
@@ -595,7 +512,7 @@
     background-color: white;
     padding: 20px;
     border-radius: 5px;
-    max-width: 600px;
+    max-width: 650px;
     width: 100%;
     position: relative;
 }
@@ -606,6 +523,18 @@
     right: 10px;
     font-size: 24px;
     cursor: pointer;
+}
+
+
+.milestone-section {
+    position: absolute;
+    height: 100%;
+    color: white;
+    text-align: center;
+    font-size: 12px;
+    padding: 5px;
+    border-right: 1px solid #fff;
+    font-size: 20px;
 }
 
 
@@ -646,6 +575,44 @@ button {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+}
+
+.button-delete {
+    padding: 10px;
+    margin-bottom: 14px;
+    max-height: 35px;
+    font-size: 16px;
+    background-color: #e21313;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.button-delete:hover {
+    background-color: #c52020;
+}
+
+.button-container {
+    display: flex;
+    gap: 10px;
+    /* Adjust spacing between buttons */
+    margin-top: 10px;
+}
+
+.button-save,
+.button-add {
+    padding: 10px 15px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.button-save {
+    background-color: #007bff;
+    /* Blue */
+    color: white;
 }
 
 button:hover {

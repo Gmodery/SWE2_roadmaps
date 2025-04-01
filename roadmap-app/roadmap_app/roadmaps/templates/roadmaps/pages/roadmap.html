@@ -103,7 +103,7 @@
                             <label for="roadmap-desc">Roadmap Description:</label>
                             <textarea id="roadmap-desc" name="roadmap-desc" value="{{ roadmap_instance.roadmap_description }}" required></textarea>
                 
-                            <label for="roadmap-deadline">Roadmap Deadline:</label>
+                            <label for="roadmap-deadline">Project Deadline:</label>
                             <input type="date" id="roadmap-deadline" name="roadmap-deadline" value="{{ roadmap_instance.deadline|date:'Y-m-d' }}" required>
 
                             <button type="submit">Save Settings</button>
@@ -115,46 +115,71 @@
                 <div class="popup" id="popup-section">
                     <div class="popup-content-sections">
                         <label class="popup-close" for="popup-toggle-section">&times;</label>
-                        <form action="#">
-                            {% csrf_token %}
-                            <h2>Section Settings</h2>
-                
-                            {% for section in sections %}
-                
-                                <div class="section">
-                                    <label for="section-name"></label>
-                                    <input type="text" id="section-name-{{ forloop.counter }}" name="section-name-{{ forloop.counter }}"
-                                        value="{{ roadmap_instance.section.section_name }}" required>
-                    
+                        <div class="section-form">
+                            <!-- Main Form: Saves all sections -->
+                            <form id="save-form" method="POST" action="{% url 'save_sections' class_id project_id roadmap_instance.id %}">
+                                {% csrf_token %}
+                                <h2>Section Settings</h2>
+                        
+                                {% for section in sections %}
+                                <!-- Wrapper to keep section and delete button aligned -->
+                                <div class="section" style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="hidden" name="section_id[]" value="{{ section.id }}" form="save-form"> <!-- Hidden ID input -->
+                        
+                                    <label for="section-name-{{ forloop.counter }}"></label>
+                                    <input type="text" id="section-name-{{ forloop.counter }}" name="section_name[]"
+                                        value="{{ section.section_name }}" required form="save-form">
+                        
                                     <label for="start-date-{{ forloop.counter }}">Start Date:</label>
-                                    <input type="date" id="start-date-{{ forloop.counter }}" value="{{ section.start_date|date:'Y-m-d' }}" name="start_date[]" required>
-                    
+                                    <input type="date" id="start-date-{{ forloop.counter }}" value="{{ section.start_date|date:'Y-m-d' }}"
+                                        name="start_date[]" required form="save-form">
+                        
                                     <label for="end-date-{{ forloop.counter }}">End Date:</label>
-                                    <input type="date" id="end-date-{{ forloop.counter }}" value="{{ section.end_date|date:'Y-m-d' }}" name="end_date[]" required>
-                                
-                                    
+                                    <input type="date" id="end-date-{{ forloop.counter }}" value="{{ section.end_date|date:'Y-m-d' }}"
+                                        name="end_date[]" required form="save-form">
+                        
+                                    <!-- Delete Button outside of the main form, but still aligned -->
+                                    <button type="submit" class="button-delete" form="delete-form-{{ section.id }}">X</button>
+                                    <form id="delete-form-{{ section.id }}" method="POST"
+                                        action="{% url 'delete_section' class_id project_id roadmap_instance.id section.id %}">
+                                        {% csrf_token %}
+                                    </form>
                                 </div>
-                
-                            {% endfor %}
-                                
-                            <div>
-                                <button type="submit">Save Settings</button>
-                                <form action="#">
-                                    <button type="submit">Add Section</button>
-                                </form>
-                            </div>
-                        </form>
+                                {% endfor %}
+                        
+                                <!-- Buttons inside the form to submit all inputs -->
+                                <div class="button-container" style="display: flex; gap: 10px; margin-top: 10px;">
+                                    <button type="submit" class="button-save" form="save-form">Save Settings</button>
+                                </div>
+                            </form>
+                        
+                            <!-- Separate form for adding a new section -->
+                            <form method="POST" action="{% url 'add_roadmap_section' class_id project_id roadmap_instance.id %}">
+                                {% csrf_token %}
+                                <button type="submit" name="add_section" class="button-add">Add Section</button>
+                            </form>
+                        </div>
+
                     </div>
                 </div>
             </div>
-            
             </div>
         </nav>
 
         <section class="roadmap-content">
             <section class="milestones-section">
                 <h2 class="milestones-title">MILESTONES</h2>
-                <div class="milestones-bar"></div>
+
+                <div class="milestones-bar">
+                    {% for section in sections %}
+                    <div class="milestone-section"
+                        style="left: {{ section.start_percent }}%; width: {{ section.width_percentage }}%; background-color: {{ section.color }}">
+                        {{ section.section_name }}
+                    </div>
+
+                    {% endfor %}
+                </div>
+
             </section>
 
             <section class="roadmap-container">
