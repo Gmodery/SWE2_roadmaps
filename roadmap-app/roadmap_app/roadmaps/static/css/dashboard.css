@@ -6,6 +6,11 @@ body {
     background-color: #f5f5f5;
 }
 
+.section-divider{
+    height: 2px;
+    background-color: #494949;
+}
+
 .success-message {
     background-color: #d4edda;
     color: #155724;
@@ -26,7 +31,8 @@ body {
 .sidebar {
     width: 200px;
     height: 100vh;
-    background-color: #2d3e50;
+    background: linear-gradient(
+        170deg,rgb(0, 58, 64) 0%, rgba(164, 246, 255, 1)100%);
     color: white;
     padding: 20px;
     position: fixed;
@@ -58,13 +64,13 @@ body {
 }
 
 .sidebar ul li a:hover {
-    background-color: #1b2a3a;
+    background-color: #003a40;
     border-radius: 4px;
 }
 
 /* Join a Class Section */
 .join-class {
-    background-color: #1b2a3a;
+    background-color: #003a40;
     padding: 15px;
     text-align: center;
     border-radius: 5px;

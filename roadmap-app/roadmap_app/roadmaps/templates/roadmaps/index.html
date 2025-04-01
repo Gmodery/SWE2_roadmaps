@@ -8,9 +8,8 @@
     <title>Login</title>
     
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
 </head>
-
 <body>
     <div class="login-container">
         <h2>Login</h2>
@@ -18,20 +17,15 @@
             {% csrf_token %} <!-- Django XSS prevention token -->
             <input type="text" name="username" placeholder="Username" required>
             <input type="password" name="password" placeholder="Password" required>
+            {% if messages %}
+                {% for message in messages %}
+                    {% if message.tags == "login error" %}
+                        <p class="error-message">{{ message }}</p>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
             <button type="submit">Login</button>
         </form>
-    </div>
-
-    <div>
-        {% if messages %}
-        <ul>
-            {% for message in messages %}
-                {% if message.tags == "login error" %}
-                    <li>{{ message }}</li>
-                {% endif %}
-            {% endfor %}
-        </ul>
-        {% endif %}
     </div>
 </body>
 
