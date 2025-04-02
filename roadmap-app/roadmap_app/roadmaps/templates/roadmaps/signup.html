@@ -8,22 +8,28 @@
     <title>Sign Up</title>
 
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/register.css' %}">
 </head>
 
+<body>
+    <div class="login-container">
+        <h2>Register</h2>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }} <!-- Automatically renders 'form' fields with labels in <p> elements -->
+            <button type="submit">Sign Up</button>
+        </form>
 
-<form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }} <!-- Automatically renders 'form' fields with labels in <p> elements -->
-    <button type="submit">Sign Up</button>
-</form>
+        {% if messages %}
+        <ul>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
 
-{% if messages %}
-<ul>
-    {% for message in messages %}
-    <li>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
+        <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+    </div>
+</body>
 
-<p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+</html>

@@ -44,16 +44,20 @@ html, body {
   top: 596px;
 }
 .sign-in, .register {
-  flex: 1; /* Ensures both buttons expand equally */
+  flex: 1;
   display: flex;
   flex-direction: row;
   gap: 8px;
   align-items: center;
   justify-content: center;
-  padding: 12px; /* Adjust padding if necessary */
+  padding: 12px;
   border-radius: 8px;
   border-width: 1px;
   border-style: solid;
+  text-decoration: none; /* Remove link underline */
+  font-size: 16px;
+  font-family: "Inter-Regular", sans-serif;
+  color: black; /* Ensure text is visible */
 }
 
 .sign-in {
@@ -64,6 +68,16 @@ html, body {
 .register {
   background: #4b9334;
   border-color: #2c2c2c;
+}
+
+.sign-in:hover {
+  background-color: #d7db64;
+  border-color: #4e4e4e;
+}
+
+.register:hover {
+  background-color: #418a31;
+  border-color: #4e4e4e;
 }
 
 .button, .button2 {
