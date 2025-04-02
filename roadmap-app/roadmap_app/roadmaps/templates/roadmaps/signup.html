@@ -16,7 +16,40 @@
         <h2>Register</h2>
         <form method="POST">
             {% csrf_token %}
-            {{ form.as_p }} <!-- Automatically renders 'form' fields with labels in <p> elements -->
+            <p>
+                <label for="{{ form.first_name.id_for_label }}">First Name:</label>
+                {{ form.first_name }}
+            </p>
+            <p>
+                <label for="{{ form.last_name.id_for_label }}">Last Name:</label>
+                {{ form.last_name }}
+            </p>
+            <p>
+                <label for="{{ form.username.id_for_label }}">Username:</label>
+                {{ form.username }}
+                <small>Can include Letters, digits and @/./+/-/_ only. Max 150 characters.</small>
+            </p>
+            
+            <p>
+                <label for="{{ form.email.id_for_label }}">Email:</label>
+                {{ form.email }}
+            </p>
+        
+            <p>
+                <label for="{{ form.password1.id_for_label }}">Password:</label>
+                {{ form.password1 }}
+                <small>Minimum 8 characters</small>
+            </p>
+        
+            <p>
+                <label for="{{ form.password2.id_for_label }}">Confirm Password:</label>
+                {{ form.password2 }}
+            </p>
+            
+            <p class="form-group">
+                <label for="{{ form.role.id_for_label }}">Role:</label>
+                {{ form.role }}
+            </p>
             <button type="submit">Sign Up</button>
         </form>
 
