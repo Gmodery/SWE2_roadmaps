@@ -75,16 +75,25 @@ class RoadmapSection(models.Model):
 class TaskCategory(models.Model):
     cat_name = models.CharField(max_length=50)
     cat_color = models.CharField(max_length=6, default="ffffff", null=False) # Hex code (minus the #)
+    cat_rows = models.IntegerField(null=True)
 
     cat_roadmap = models.ForeignKey(Roadmap, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
-        return self.name
+        return self.cat_name
+    
+
+class TaskRow(models.Model):
+    # An individual row that contains tasks
+    taskrow_category = models.ForeignKey(TaskCategory, on_delete=models.CASCADE, null=True, related_name="taskrow_cat")
+    end_time = models.DateField(null=True)
+
+    def __str__(self):
+        return f"Row ID: {self.id}"
 
 class Task(models.Model):
     TASK_STATUS_CHOICES = (
         ('not_started', 'Not Started'),
-        ('pending', 'Pending'),
         ('in_progress', 'In Progress'),
         ('completed', 'Completed'),
     )
@@ -95,15 +104,19 @@ class Task(models.Model):
     task_description = models.TextField()
     status = models.CharField(max_length=20, choices=TASK_STATUS_CHOICES, default='pending')
     # Use a ForeignKey to connect the task to a category 
-    category = models.ForeignKey(TaskCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name="task_cat")
+    category = models.ForeignKey(TaskCategory, on_delete=models.CASCADE, null=True, blank=True, related_name="task_cat")
     start_time = models.DateField()
     end_time = models.DateField()
+
+    task_row = models.ForeignKey(TaskRow, null=True, on_delete=models.SET_NULL, related_name='task_set')
 
     width_percentage = models.FloatField(null=True)
     start_percent = models.FloatField(null=True)
 
     def __str__(self):
         return self.task_name
+
+    
 
     
 

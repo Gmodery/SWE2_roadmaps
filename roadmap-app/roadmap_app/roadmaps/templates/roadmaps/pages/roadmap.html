@@ -58,7 +58,7 @@
                 <div class="popup" id="popup-category">
                     <div class="popup-content">
                         <label class="popup-close" for="popup-toggle-category">&times;</label>
-                        <form action="#">
+                        <form method="POST" action="{% url 'roadmap-details' class_id project_id roadmap_instance.id %}">
                             {% csrf_token %}
                             <h2>Add Category</h2>
                             <label for="category-name">Category Name:</label>
@@ -76,16 +76,42 @@
                 <div class="popup" id="popup-task">
                     <div class="popup-content">
                         <label class="popup-close" for="popup-toggle-task">&times;</label>
-                        <form action="#">
+                        <form method="POST" action="{% url 'roadmap-details' class_id project_id roadmap_instance.id %}">
                             {% csrf_token %}
                             <h2>Add Task</h2>
+
+                            {% for section in sections %}
+                                {% if forloop.first %}
+                                    <h3>Note: New tasks must be within the bounds of the project timeline <br> 
+                                        ({{ section.start_date }} - {{ roadmap_instance.deadline }})</h3>
+                                {% endif %}
+                            {% endfor %}
+
                             <label for="task-name">Task Name:</label>
                             <input type="text" id="task-name" name="task-name" required>
                 
                             <label for="task-desc">Task Description:</label>
                             <textarea id="task-desc" name="task-desc" required></textarea>
+
+                            <label for="task-category">Task Name:</label>
+                            <select id="task-category" name="task-category" required>
+                                <option value="" disabled selected>Task Category</option>
+                                {% for category in categories %}
+                                    <option value="{{ category.id }}">{{ category }}</option>
+                                {% endfor %}
+                            </select>
+
+                            <label for="task-start">Task Start Date:</label>
+                            {% for section in sections %}
+                                {% if forloop.first %}
+                                    <input type="date" id="task-start" name="task-start" value="{{ section.start_date|date:'Y-m-d' }}" required>
+                                {% endif %}
+                            {% endfor %}
+
+                            <label for="task-deadline">Task Deadline:</label>
+                            <input type="date" id="task-deadline" name="task-deadline" value="{{ roadmap_instance.deadline|date:'Y-m-d' }}" required>
                 
-                            <button type="submit">Submit</button>
+                            <button type="submit">Add Task</button>
                         </form>
                     </div>
                 </div>
@@ -94,14 +120,14 @@
                 <div class="popup" id="popup-roadmap">
                     <div class="popup-content">
                         <label class="popup-close" for="popup-toggle-roadmap">&times;</label>
-                        <form action="#">
+                        <form method="POST" action="{% url 'roadmap-details' class_id project_id roadmap_instance.id %}">
                             {% csrf_token %}
                             <h2>Roadmap Settings</h2>
                             <label for="roadmap-title">Roadmap Title:</label>
                             <input type="text" id="roadmap-title" name="roadmap-title" value="{{ roadmap_instance.roadmap_title }}" required>
                 
                             <label for="roadmap-desc">Roadmap Description:</label>
-                            <textarea id="roadmap-desc" name="roadmap-desc" value="{{ roadmap_instance.roadmap_description }}" required></textarea>
+                            <textarea id="roadmap-desc" name="roadmap-desc" required>{{ roadmap_instance.roadmap_description }}</textarea>
                 
                             <label for="roadmap-deadline">Project Deadline:</label>
                             <input type="date" id="roadmap-deadline" name="roadmap-deadline" value="{{ roadmap_instance.deadline|date:'Y-m-d' }}" required>
@@ -123,7 +149,6 @@
                                 <h3>Note: Section timelines may not overlap</h3>
                         
                                 {% for section in sections %}
-                                <!-- Wrapper to keep section and delete button aligned -->
                                 <div class="section" style="display: flex; align-items: center; gap: 10px;">
                                     <input type="hidden" name="section_id[]" value="{{ section.id }}" form="save-form"> <!-- Hidden ID input -->
                         
@@ -139,7 +164,7 @@
                                     <input type="date" id="end-date-{{ forloop.counter }}" value="{{ section.end_date|date:'Y-m-d' }}"
                                         name="end_date[]" required form="save-form">
                         
-                                    <!-- Delete Button outside of the main form, but still aligned -->
+                                    <!-- Delete Button -->
                                     <button type="submit" class="button-delete" form="delete-form-{{ section.id }}">X</button>
                                     <form id="delete-form-{{ section.id }}" method="POST"
                                         action="{% url 'delete_section' class_id project_id roadmap_instance.id section.id %}">
@@ -154,7 +179,7 @@
                                 </div>
                             </form>
                         
-                            <!-- Separate form for adding a new section -->
+
                             <form method="POST" action="{% url 'add_roadmap_section' class_id project_id roadmap_instance.id %}">
                                 {% csrf_token %}
                                 <button type="submit" name="add_section" class="button-add">Add Section</button>
@@ -172,9 +197,11 @@
                 <h2 class="milestones-title">MILESTONES</h2>
                 <div class="milestones-bar">
                     {% for section in sections %}
-                    <div class="milestone-section"
-                        style="left: {{ section.start_percent }}%; width: {{ section.width_percentage }}%;">
+                    <div class="milestone-section" style="left: {{ section.start_percent }}%; width: {{ section.width_percentage }}%;"
+                        data-tooltip="{{ section.section_name }} ({{ section.start_date|date:'Y-m-d' }} - {{ section.end_date|date:'Y-m-d' }})">
+                        {% if section.width_percentage > 10 %}
                         {{ section.section_name }}
+                        {% endif %}
                     </div>
                     {% endfor %}
                 </div>
@@ -183,30 +210,99 @@
             <section class="roadmap-container" style="display: flex;">
                 <aside class="category-sidebar">
                     {% for category in categories %}
-                    <div class="category" style="background-color: #{{ category.cat_color }};"></div>
+                    <div class="category" style="background-color: {{ category.cat_color }}; position: relative; height: calc(35 * {{ category.cat_rows }}px);" data-tooltip="{{ category.cat_name }}">
+
+                        <form method="POST" action="{% url 'delete-category' class_id project_id roadmap_instance.id category.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="button-delete-category">X</button>
+                        </form>
+
+                    </div>
                     {% endfor %}
                 </aside>
-        
+            
                 <div class="roadmap-grid">
-                    <div class="grid-row">
-                        <div class="grid-item blue-item"></div>
-                        <div class="grid-group">
-                            <div class="grid-item blue-item"></div>
-                            <div class="grid-item blue-item"></div>
+                    
+                    
+                    {% for task_row_list in task_rows %}
+                        {% for task_row in task_row_list %}
+                        <div class="grid-row">
+                            {% for task in task_row.task_set.all %}
+                            <!-- Checkbox to trigger the popup -->
+                            <input type="checkbox" id="popup-toggle-task-details-{{ task.id }}" class="popup-toggle" hidden>
+                            
+                            <!-- Task item -->
+                            <label for="popup-toggle-task-details-{{ task.id }}">
+                                <div class="grid-item"
+                                    style="background-color: {{ task.category.cat_color }}; left: {{ task.start_percent }}%; width: {{ task.width_percentage }}%; border: 3px dashed {% if task.status == 'not_started' %}#FF0000{% elif task.status == 'in_progress' %}#ffe205{% elif task.status == 'completed' %}#3cfa02{% else %}#808080{% endif %};"
+                                    data-tooltip="{{ task.task_name }}">
+                                </div>
+                            </label>
+                            
+                            <div class="popup" id="popup-task-details-{{ task.id }}">
+                                <div class="popup-content">
+                                    <label class="popup-close" for="popup-toggle-task-details-{{ task.id }}">&times;</label>
+                                    <form method="POST" action="{% url 'roadmap-details' class_id project_id roadmap_instance.id %}">
+                                        {% csrf_token %}
+                                        <h2>Task Details</h2>
+
+                                        <input type="hidden" name="task_id" value="{{ task.id }}">
+
+                                        <label for="task-name-edit">Task Name:</label>
+                                        <input type="text" id="task-name-edit" name="task-name-edit" value="{{ task.task_name }}" required>
+                                        
+                                        <label for="task-desc-edit">Task Description:</label>
+                                        <textarea id="task-desc-edit" name="task-desc-edit" required>{{ task.task_description }}</textarea>
+
+                                        <label for="task-category-edit">Task Name:</label>
+                                        <select id="task-category-edit" name="task-category-edit" required>
+                                            <option value="" disabled>Task Category</option>
+                                            {% for category in categories %}
+                                            <option value="{{ category.id }}" {% if task.category.id == category.id %}selected{% endif %}>
+                                                {{ category }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+
+                                        <label for="task-status-edit">Task Status:</label>
+                                        <select id="task-status-edit" name="task-status-edit" required>
+                                            <option value="" disabled selected>Task Status</option>
+                                            <option value="not_started" {% if task.status == 'not_started' %}selected{% endif %}>Not Started</option>
+                                            <option value="in_progress" {% if task.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                                            <option value="completed" {% if task.status == 'completed' %}selected{% endif %}>Completed</option>
+                                        </select>
+
+                                        
+                                        <label for="task-start-edit">Task Start:</label>
+                                        <input type="date" id="task-start-edit" name="task-start-edit" value="{{ task.start_time|date:'Y-m-d' }}"
+                                            required>
+                                        
+                                        <label for="task-deadline-edit">Task End:</label>
+                                        <input type="date" id="task-deadline-edit" name="task-deadline-edit" value="{{ task.end_time|date:'Y-m-d' }}"
+                                            required>
+                                        
+                                        <button type="submit">Save Settings</button>
+                                    </form>
+
+                                    <form method="POST" action="{% url 'roadmap-details' class_id project_id roadmap_instance.id %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="task_id_delete" value="{{ task.id }}">
+
+                                        <button type="submit" class="button-delete" style="margin-top: 15px;">Delete Task</button>
+                                    </form>
+
+                                </div>
+                            </div>
+
+                            {% endfor %}
                         </div>
-                    </div>
-                    <div class="grid-row">
-                        <div class="grid-item blue-item"></div>
-                        <div class="grid-item blue-item"></div>
-                    </div>
-                    <div class="grid-row">
-                        <div class="grid-group">
-                            <div class="grid-item blue-item"></div>
-                            <div class="grid-item blue-item"></div>
-                        </div>
-                    </div>
+                        {% endfor %}
+
+                        <div style="margin-top: 50px;"></div>
+                    {% endfor %}
                 </div>
             </section>
+
         </section>
     </main>
 </body>
