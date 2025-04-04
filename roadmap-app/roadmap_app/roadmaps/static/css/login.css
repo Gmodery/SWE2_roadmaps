@@ -26,6 +26,14 @@ html, body {
     text-align: center;
 }
 
+/* Reserve space for the error message */
+.error-message {
+    font-size: 14px;
+    min-height: 20px; /* Ensures space is always there */
+    display: block;
+    margin-top: 5px;
+}
+
 input {
     width: 100%;
     padding: 10px;
