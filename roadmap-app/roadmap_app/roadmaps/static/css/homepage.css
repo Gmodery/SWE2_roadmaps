@@ -57,7 +57,7 @@ html, body {
   text-decoration: none; /* Remove link underline */
   font-size: 16px;
   font-family: "Inter-Regular", sans-serif;
-  color: black; /* Ensure text is visible */
+  color: black;
 }
 
 .sign-in {

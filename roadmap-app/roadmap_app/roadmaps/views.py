@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Roadmap, AppUser, Class, Project, Task, TaskCategory, RoadmapSection
+from .models import Roadmap, AppUser, Class, Project, Task, TaskCategory, RoadmapSection, TaskRow
 from django.contrib.auth.models import User
 from collections import defaultdict
 from django.urls import reverse
@@ -9,6 +9,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .forms import SignUpForm, CreateClassForm, CreateProjectForm
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 
 def home(request):
     return render(request, 'roadmaps/home.html')
@@ -334,13 +335,197 @@ def account_detail_view(request):
 def roadmap_details_view(request, class_id, project_id, roadmap_id):
     roadmap_instance = Roadmap.objects.get(id=roadmap_id)
     categories = TaskCategory.objects.filter(cat_roadmap=roadmap_instance)
+   
+    task_rows = []
+    for category in categories:
+        cat_task_rows = TaskRow.objects.filter(taskrow_category=category)
+        task_rows.append(cat_task_rows)
+
     sections = sorted(RoadmapSection.objects.filter(parent_roadmap=roadmap_instance), key=lambda section: section.start_date)
 
 
-    return render(request, "roadmaps/pages/roadmap.html", {"roadmap_instance": roadmap_instance, "categories": categories, "sections": sections, "user": request.session['username'], "class_id": class_id, "project_id": project_id})
+    def update_tasks(category):
+        # Recalculate necessary rows for category
+        # Step 1: Fetch all tasks from the database
+        tasks = Task.objects.filter(task_roadmap=roadmap_instance, category=category).values('id', 'start_time', 'end_time').order_by('start_time')
+
+        # List to track the active TaskRow objects (rows that are currently occupied)
+        active_rows = []
+
+        # Step 1: Iterate through each task
+        for task in tasks:
+            start_time = task['start_time']
+            end_time = task['end_time']
+
+            # Step 2: Try to fit the current task into an existing row
+            assigned = False
+            for row in active_rows:
+                if row.end_time < start_time:
+                    # If the task can fit in this row (it doesn't overlap with the task in this row)
+                    row.end_time = end_time  # Update the row's end time
+                    row.save()  # Save the updated row
+
+                    # Associate task with the existing row
+                    task_instance = Task.objects.get(id=task['id'])
+                    task_instance.task_row = row
+                    task_instance.save()
+                    assigned = True
+                    break
+
+            # Step 3: If no row was found for the task, we need to add a new row
+            if not assigned:
+                # Create a new row and save it
+                new_row = TaskRow.objects.create(taskrow_category=category, end_time=end_time)
+
+                # Assign the task to the new row
+                task_instance = Task.objects.get(id=task['id'])
+                task_instance.task_row = new_row
+                task_instance.save()
+
+                # Add the new row to active_rows
+                active_rows.append(new_row)
+
+        TaskRow.objects.filter(taskrow_category=category).all()
+        TaskRow.objects.filter(task_set__isnull=True).delete()
+
+        # Set the number of rows for the category
+        category.cat_rows = len(active_rows)
+
+        # Save the category with the updated row count
+        category.save()
+
+        category.refresh_from_db()
+
+
 
     if request.method == "POST":
-        pass
+        if "category-name" in request.POST:
+            # Add category
+            cat_name = request.POST["category-name"]
+            cat_color = request.POST["category-color"]
+
+            new_category = TaskCategory(cat_name=cat_name, cat_color=cat_color, cat_roadmap=roadmap_instance, cat_rows=1)
+
+            new_category.save()
+
+            categories = TaskCategory.objects.filter(cat_roadmap=roadmap_instance)
+
+
+        elif "task-name" in request.POST:
+            # Add task
+            task_name = request.POST["task-name"]
+            task_desc = request.POST["task-desc"]
+            task_cat = int(request.POST["task-category"])
+            task_start = request.POST['task-start']
+            task_deadline = request.POST['task-deadline']
+
+            if task_start < task_deadline: # Start must be before end
+                first_start_date = sections[0].start_date
+                
+                if task_start >= str(first_start_date): # Start date must be after earliest section start
+                    category = TaskCategory.objects.get(id=task_cat)
+
+                    total_duration = (roadmap_instance.deadline - first_start_date).days
+
+                    start_percent = ((datetime.strptime(task_start, "%Y-%m-%d").date() - first_start_date).days / total_duration) * 100
+                    width_percentage = ((datetime.strptime(task_deadline, "%Y-%m-%d").date() - datetime.strptime(task_start, "%Y-%m-%d").date()).days) / total_duration * 100
+
+                    new_task = Task(
+                        task_roadmap=roadmap_instance,
+                        task_name=task_name,
+                        task_description=task_desc,
+                        status='not_started',
+                        category=category,
+                        start_time=task_start,
+                        end_time=task_deadline,
+                        start_percent=start_percent,
+                        width_percentage=width_percentage
+                    )
+
+                    new_task.save()
+
+                    category.refresh_from_db()
+
+                    update_tasks(category=category)
+
+                    categories = TaskCategory.objects.filter(cat_roadmap=roadmap_instance)
+
+
+        elif "roadmap-title" in request.POST:
+            # Roadmap Settings update
+            map_title = request.POST["roadmap-title"]
+            map_desc = request.POST["roadmap-desc"]
+            map_deadline = request.POST["roadmap-deadline"]
+
+            roadmap_instance.roadmap_title = map_title
+            roadmap_instance.roadmap_description = map_desc
+            roadmap_instance.deadline = map_deadline
+
+            roadmap_instance.save()
+
+        
+        elif "task-name-edit" in request.POST:
+            task_start = request.POST['task-start-edit']
+            task_deadline = request.POST['task-deadline-edit']
+
+            if task_start < task_deadline: # Start must be before end
+                first_start_date = sections[0].start_date
+                
+                if task_start >= str(first_start_date): # Start date must be after earliest section start
+                    total_duration = (roadmap_instance.deadline - first_start_date).days
+
+                    start_percent = ((datetime.strptime(task_start, "%Y-%m-%d").date() - first_start_date).days / total_duration) * 100
+                    width_percentage = ((datetime.strptime(task_deadline, "%Y-%m-%d").date() - datetime.strptime(task_start, "%Y-%m-%d").date()).days) / total_duration * 100
+
+
+                    task_id = request.POST['task_id']
+                    task_name = request.POST['task-name-edit']
+                    task_desc = request.POST['task-desc-edit']
+                    task_cat = TaskCategory.objects.get(id=int(request.POST['task-category-edit']))
+                    task_status = request.POST['task-status-edit']
+                    task_start = datetime.strptime(request.POST['task-start-edit'], '%Y-%m-%d').date()
+                    task_end = datetime.strptime(request.POST['task-deadline-edit'], '%Y-%m-%d').date()
+
+                    task = Task.objects.get(id=task_id)
+                    task.task_name = task_name
+                    task.task_description = task_desc
+                    task.category = task_cat
+                    task.status = task_status
+                    task.start_time = task_start
+                    task.end_time = task_end
+                    task.start_percent = start_percent
+                    task.width_percentage = width_percentage
+
+                    print(task.start_percent, task.width_percentage)
+                    
+                    task.save()
+
+                    task.refresh_from_db()
+
+                    update_tasks(category=task_cat)
+
+        
+        elif "task_id_delete" in request.POST:
+            try:
+                task = Task.objects.get(id=request.POST["task_id_delete"])
+                #print(task)
+                task.delete()
+
+                update_tasks(category=task.category)
+                
+                categories = TaskCategory.objects.filter(cat_roadmap=roadmap_instance)
+                
+
+            except:
+                pass
+
+
+
+            
+                
+    print(categories[0].cat_rows)
+
+    return render(request, "roadmaps/pages/roadmap.html", {"roadmap_instance": roadmap_instance, "categories": categories, "task_rows": task_rows, "sections": sections, "user": request.session['username'], "class_id": class_id, "project_id": project_id})
 
     # Student view
     if request.session["usertype"] == "student":
@@ -351,26 +536,59 @@ def roadmap_details_view(request, class_id, project_id, roadmap_id):
         return redirect("dashboard")
 
 
+
+@login_required(login_url='login')
+def delete_category_view(request, class_id, project_id, roadmap_id, cat_id):
+    if request.method == "POST":
+        try:
+            category = TaskCategory.objects.get(id=cat_id)
+            category.delete()
+
+        except:
+            pass
+
+
+    roadmap_instance = Roadmap.objects.get(id=roadmap_id)
+    categories = TaskCategory.objects.filter(cat_roadmap=roadmap_instance)
+    sections = sorted(RoadmapSection.objects.filter(parent_roadmap=roadmap_instance), key=lambda section: section.start_date)
+
+    task_rows = []
+    for category in categories:
+        cat_task_rows = TaskRow.objects.filter(taskrow_category=category)
+        task_rows.append(cat_task_rows)
+
+
+    return render(request, "roadmaps/pages/roadmap.html", {"roadmap_instance": roadmap_instance, "categories": categories, "task_rows": task_rows, "sections": sections, "user": request.session['username'], "class_id": class_id, "project_id": project_id}) 
+
+
+
+
 @login_required(login_url='login')
 def add_section_view(request, class_id, project_id, roadmap_id):
     roadmap_instance = Roadmap.objects.get(id=roadmap_id)
     categories = TaskCategory.objects.filter(cat_roadmap=roadmap_instance)
+
+    task_rows = []
+    for category in categories:
+        cat_task_rows = TaskRow.objects.filter(taskrow_category=category)
+        task_rows.append(cat_task_rows)
         
     if request.method == "POST":
         if "add_section" in request.POST:
-            new_section = RoadmapSection(parent_roadmap=roadmap_instance, section_name="New Section", start_date=date.today(), end_date=date.today())
+            sections = sorted(RoadmapSection.objects.filter(parent_roadmap=roadmap_instance), key=lambda section: section.start_date)
+            new_end = sections[-1].end_date+timedelta(days=10) if sections[-1].end_date+timedelta(days=10) < roadmap_instance.deadline else roadmap_instance.deadline
+
+            new_section = RoadmapSection(parent_roadmap=roadmap_instance, section_name="New Section", start_date=sections[-1].end_date, end_date=new_end)
             new_section.save()
 
     sections = sorted(RoadmapSection.objects.filter(parent_roadmap=roadmap_instance), key=lambda section: section.start_date)
 
     RoadmapSection.objects.last().start_date = sections[-1].end_date
 
-    return render(request, "roadmaps/pages/roadmap.html", {"roadmap_instance": roadmap_instance, "categories": categories, "sections": sections, "user": request.session['username'], "class_id": class_id, "project_id": project_id})
+    return render(request, "roadmaps/pages/roadmap.html", {"roadmap_instance": roadmap_instance, "categories": categories, "task_rows": task_rows, "sections": sections, "user": request.session['username'], "class_id": class_id, "project_id": project_id})
 
 
 def save_sections_view(request, class_id, project_id, roadmap_id):
-    # TODO: Verify that start is before end and that they don't overlap
-
     if request.method == "POST":
         roadmap_instance = Roadmap.objects.get(id=roadmap_id)
 
@@ -399,35 +617,48 @@ def save_sections_view(request, class_id, project_id, roadmap_id):
 
         sections = sorted(RoadmapSection.objects.filter(parent_roadmap=roadmap_instance), key=lambda section: section.start_date)
 
-        # Second pass to fix overlaps
+        # Second pass to fix overlaps and ensure minimum section length
         for i in range(len(section_ids) - 1):
             current_section = RoadmapSection.objects.get(id=section_ids[i])
             next_section = RoadmapSection.objects.get(id=section_ids[i + 1])
 
-            # Ensure sections are properly ordered
-            if current_section.end_date > next_section.start_date:
-                # Shift next section's start date to the day after the current section's end date
-                next_section.start_date = current_section.end_date + timedelta(days=1)
+            # Ensure the current section has at least 10 days
+            min_end_date = current_section.start_date + timedelta(days=10)
+            if current_section.end_date < min_end_date:
+                current_section.end_date = min_end_date
 
-                # Ensure next section's start date doesn't exceed its end date
-                if next_section.start_date > next_section.end_date:
-                    next_section.end_date = next_section.start_date  # Prevent negative duration
+            # Ensure the next section starts immediately after the current section
+            next_section.start_date = current_section.end_date
 
-                next_section.save()
+            # Ensure the next section also has at least 10 days
+            next_min_end_date = next_section.start_date + timedelta(days=10)
+            if next_section.end_date < next_min_end_date:
+                next_section.end_date = next_min_end_date
 
             current_section.save()
+            next_section.save()
 
 
         categories = TaskCategory.objects.filter(cat_roadmap=roadmap_instance)
         sections = sorted(RoadmapSection.objects.filter(parent_roadmap=roadmap_instance), key=lambda section: section.start_date)
+
+        task_rows = []
+        for category in categories:
+            cat_task_rows = TaskRow.objects.filter(taskrow_category=category)
+            task_rows.append(cat_task_rows)
         
-        return render(request, "roadmaps/pages/roadmap.html", {"roadmap_instance": roadmap_instance, "categories": categories, "sections": sections, "user": request.session['username'], "class_id": class_id, "project_id": project_id})
+        return render(request, "roadmaps/pages/roadmap.html", {"roadmap_instance": roadmap_instance, "categories": categories, "task_rows": task_rows, "sections": sections, "user": request.session['username'], "class_id": class_id, "project_id": project_id})
 
 
 
 def remove_section_view(request, class_id, project_id, roadmap_id, section_id):
     roadmap_instance = Roadmap.objects.get(id=roadmap_id)
     categories = TaskCategory.objects.filter(cat_roadmap=roadmap_instance)
+
+    task_rows = []
+    for category in categories:
+        cat_task_rows = TaskRow.objects.filter(taskrow_category=category)
+        task_rows.append(cat_task_rows)
 
     if request.method == "POST":
         try:
@@ -437,7 +668,7 @@ def remove_section_view(request, class_id, project_id, roadmap_id, section_id):
 
     sections = sorted(RoadmapSection.objects.filter(parent_roadmap=roadmap_instance), key=lambda section: section.start_date)
 
-    return render(request, "roadmaps/pages/roadmap.html", {"roadmap_instance": roadmap_instance, "categories": categories, "sections": sections, "user": request.session['username'], "class_id": class_id, "project_id": project_id})
+    return render(request, "roadmaps/pages/roadmap.html", {"roadmap_instance": roadmap_instance, "categories": categories, "task_rows": task_rows, "sections": sections, "user": request.session['username'], "class_id": class_id, "project_id": project_id})
 
 # render function syntax: 
 # render(HTTP request object, 
