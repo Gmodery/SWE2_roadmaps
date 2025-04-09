@@ -33,6 +33,7 @@ urlpatterns = [
     path('pages/dashboard/class/<int:class_id>/project/<int:project_id>/delete', views.delete_project_view, name='project-delete'),
     path('pages/dashboard/class/<int:class_id>/project/<int:project_id>/create-roadmaps', views.create_roadmap_view, name='roadmap-create'),
     path('pages/dashboard/class/<int:class_id>/project/<int:project_id>/<int:roadmap_id>/', views.roadmap_details_view, name='roadmap-details'),
+    path('pages/dashboard/class/<int:class_id>/project/<int:project_id>/<int:roadmap_id>/items', views.roadmap_items_view, name='roadmap-items'),
     path('pages/dashboard/account', views.account_detail_view, name='account'),
     path('pages/dashboard/class/<int:class_id>/project/<int:project_id>/<int:roadmap_id>/add-section/', views.add_section_view, name='add_roadmap_section'),
     path('pages/dashboard/class/<int:class_id>/project/<int:project_id>/<int:roadmap_id>/save-sections/', views.save_sections_view, name='save_sections'),
