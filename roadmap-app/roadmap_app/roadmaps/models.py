@@ -4,24 +4,30 @@ from django.contrib.auth.models import AbstractUser
 
 # One table to hold all user types
 # Extends AbstractUser so we can still use Django's authentication features
-class AppUser(AbstractUser):
-    USER_ROLES = (
-        ('admin', 'Administrator'),
-        ('instructor', 'Instructor'),
+class AppUser(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    ROLE_CHOICES = [
         ('student', 'Student'),
-    )
+        ('instructor', 'Instructor'),
+        ('admin', 'Admin'),
+    ]
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
 
-    # Add one field to define user type
-    role = models.CharField(max_length=20, choices=USER_ROLES, default='student')
-
+    def __str__(self):
+        return f"{self.user.username} ({self.role})"
 
 class Ticket(models.Model):
-    ticket_title = models.CharField(max_length=50)
-    ticket_description = models.TextField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    subject = models.CharField(max_length=255)
+    message = models.TextField()
+    status = models.CharField(max_length=20, choices=[
+        ('open', 'Open'),
+        ('resolved', 'Resolved')
+    ], default='open')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.ticket_title
+        return f"{self.subject} - {self.status}"
 
 
 class Class(models.Model):

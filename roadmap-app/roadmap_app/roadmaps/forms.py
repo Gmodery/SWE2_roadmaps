@@ -1,7 +1,11 @@
 from django import forms
-from .models import AppUser, Class, Roadmap, Project
+from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
+from .models import AppUser, Class, Roadmap, Project
 
+# ------------------------------
+# STUDENT / INSTRUCTOR SIGNUP FORM
+# ------------------------------
 class SignUpForm(UserCreationForm):
     first_name = forms.CharField(
         max_length=30, required=True,
@@ -32,6 +36,29 @@ class SignUpForm(UserCreationForm):
         model = AppUser
         fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2', 'role']
 
+# ------------------------------
+# ADMIN: CREATE DJANGO USER (for AppUser pairing)
+# ------------------------------
+class CreateUserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['password'].widget = forms.PasswordInput()
+
+# ------------------------------
+# ADMIN: ASSIGN ROLE TO USER
+# ------------------------------
+class AppUserRoleForm(forms.ModelForm):
+    class Meta:
+        model = AppUser
+        fields = ['role']
+
+# ------------------------------
+# INSTRUCTOR: CREATE CLASS FORM
+# ------------------------------
 class CreateClassForm(forms.ModelForm):
     class_name = forms.CharField(
         max_length=30, required=True,
@@ -46,6 +73,9 @@ class CreateClassForm(forms.ModelForm):
         model = Class
         fields = ["class_name", "class_desc"]
 
+# ------------------------------
+# INSTRUCTOR: CREATE PROJECT FORM
+# ------------------------------
 class CreateProjectForm(forms.ModelForm):
     project_name = forms.CharField(
         max_length=30, required=True,
