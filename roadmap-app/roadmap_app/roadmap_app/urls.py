@@ -38,7 +38,9 @@ urlpatterns = [
     path('pages/dashboard/class/<int:class_id>/project/<int:project_id>/<int:roadmap_id>/add-section/', views.add_section_view, name='add_roadmap_section'),
     path('pages/dashboard/class/<int:class_id>/project/<int:project_id>/<int:roadmap_id>/save-sections/', views.save_sections_view, name='save_sections'),
     path('pages/dashboard/class/<int:class_id>/project/<int:project_id>/<int:roadmap_id>/delete-section/<int:section_id>', views.remove_section_view, name='delete_section'),
-    path('pages/dashboard/class/<int:class_id>/project/<int:project_id>/<int:roadmap_id>/delete-category/<int:cat_id>', views.delete_category_view, name='delete-category')
+    path('pages/dashboard/class/<int:class_id>/project/<int:project_id>/<int:roadmap_id>/delete-category/<int:cat_id>', views.delete_category_view, name='delete-category'),
+    path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('admin/ticket/<int:ticket_id>/resolve/', views.resolve_ticket, name='resolve_ticket'),
 
 
 
