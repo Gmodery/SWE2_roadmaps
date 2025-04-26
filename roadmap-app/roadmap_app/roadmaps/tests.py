@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase, Client
 from .models import AppUser
 from .forms import SignUpForm
 from django.urls import reverse
@@ -78,3 +78,29 @@ class NavigationTestCase(TestCase):
         """Test redirection for pages requiring login"""
         response = self.client.get(reverse('dashboard'))
         self.assertRedirects(response, '/login/?next=/pages/dashboard')
+
+
+    def setUp(self):
+        self.client = Client()
+        self.user = AppUser.objects.create_user(
+            username='user',
+            password='pass',
+            role='student'
+        )
+
+    def test_login(self):
+        login = self.client.login(username='user', password='pass')
+        self.assertTrue(login)
+
+
+    def test_protected_view_access(self):
+        self.client.login(username='user', password='pass')
+
+        session = self.client.session
+        session['usertype'] = 'student'
+        session['username'] = 'user'
+        session['user_id'] = 1
+        session.save()
+
+        response = self.client.get(reverse('dashboard'))
+        self.assertEqual(response.status_code, 200)
