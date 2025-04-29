@@ -271,9 +271,11 @@ def create_project_view(request, class_id):
     else:
         return redirect("dashboard")
 
+from .models import Roadmap, GroupRoadmap
 
 @login_required(login_url='login')
 def project_details_view(request, class_id, project_id):
+    # Fetch class and project instances
     class_instance = Class.objects.get(id=class_id)
     project_instance = Project.objects.get(id=project_id)
 
@@ -285,30 +287,34 @@ def project_details_view(request, class_id, project_id):
 
         if current_student not in class_students:
             return redirect('dashboard')
-        
+
+        # Fetch only the roadmaps assigned to this student
         all_maps = Roadmap.objects.filter(parent_project=project_instance)
         roadmaps = []
-
         for roadmap in all_maps:
             if current_student in roadmap.roadmap_students.all():
                 roadmaps.append(roadmap)
 
-
+        # Students typically won't see group roadmaps yet (optional later)
+        group_roadmaps = []
 
     elif request.session['usertype'] == "instructor":
         # If instructor, verify that they own this class
         if class_instance.class_instructor.id != request.session['user_id']:
             return redirect('dashboard')
-        
-        # If instructor, able to view all roadmaps for this project
+
+        # Instructors can view all roadmaps and group roadmaps
         roadmaps = Roadmap.objects.filter(parent_project=project_instance)
-        
-    print(class_instance.id, project_instance.id, roadmaps[0].id)
+        group_roadmaps = GroupRoadmap.objects.filter(parent_project=project_instance)
 
-    return render(request, "roadmaps/pages/project_details.html", {"student": request.session['usertype'] == "student", "class_instance": class_instance,
-                                                                   "project_instance": project_instance, "roadmaps": roadmaps})
-
-
+    # Render the project detail page
+    return render(request, "roadmaps/pages/project_details.html", {
+        "student": request.session['usertype'] == "student",
+        "class_instance": class_instance,
+        "project_instance": project_instance,
+        "roadmaps": roadmaps,
+        "group_roadmaps": group_roadmaps,
+    })
 
 def delete_project_view(request, class_id, project_id):
     Project.objects.get(id=project_id).delete()
@@ -723,3 +729,26 @@ def remove_section_view(request, class_id, project_id, roadmap_id, section_id):
 # render(HTTP request object, 
 # html file in templates directory, 
 # dictionary of data to pass to the template {variable_name : roadmaps list} )
+from .models import GroupRoadmap, Project
+
+def create_group_roadmap(request):
+    if request.method == 'POST':
+        title = request.POST.get('roadmap_title')
+        description = request.POST.get('roadmap_description')
+        selected_student_ids = request.POST.getlist('selected_students')
+        project_id = request.POST.get('project_id')  # Make sure your form gives you the project id too!
+
+        # Get the parent project
+        parent_project = Project.objects.get(id=project_id)
+
+        # Create the GroupRoadmap
+        group_roadmap = GroupRoadmap.objects.create(
+            title=title,
+            description=description,
+            parent_project=parent_project  # <-- Set it!
+        )
+
+        # Add selected students
+        group_roadmap.students.set(selected_student_ids)
+
+        return redirect('dashboard')  # or wherever you want
