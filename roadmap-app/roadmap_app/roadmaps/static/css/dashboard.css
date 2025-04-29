@@ -144,20 +144,14 @@ body {
 
 /* Course Card */
 .course-card {
-    /* background-color: white;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    text-align: center;
-    width: 150px */
     background-color: white;
-    padding: 20px;              /* more space inside the card */
+    padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     text-align: center;
-    width: 200px;               /* increase width */
-    height: 150px;               /* let height grow with content */
-    transition: transform 0.2s ease-in-out; /* optional hover effect */
+    width: 200px;
+    height: 150px;
+    transition: transform 0.2s ease-in-out;
 }
 
 .course-card h2 {
@@ -171,7 +165,7 @@ body {
 }
 
 .course-card:hover {
-    transform: scale(1.05);     /* optional hover enlargement */
+    transform: scale(1.05);
 }
 
 .course-card button {
@@ -184,11 +178,11 @@ body {
 }
 
 .course-card button:hover {
-    background-color: #0056b3;
+    background-color: #418a31;
 }
 
 .remove-function button {
-    background-color: #ce0000;
+    background-color: rgb(0, 58, 64);
     color: rgb(255, 255, 255);
     padding: 8px 15px;
     border: none;
@@ -197,7 +191,7 @@ body {
 }
 
 .create-function button {
-    background-color: #007bff;
+    background-color: #4CAF50;
     color: rgb(255, 255, 255);
     padding: 8px 15px;
     margin-top: 10px;
