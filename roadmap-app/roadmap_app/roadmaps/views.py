@@ -555,14 +555,6 @@ def roadmap_details_view(request, class_id, project_id, roadmap_id):
 
     return render(request, "roadmaps/pages/roadmap.html", {"roadmap_instance": roadmap_instance, "categories": categories, "task_rows": task_rows, "sections": sections, "user": request.session['username'], "class_id": class_id, "project_id": project_id})
 
-    # Student view
-    if request.session["usertype"] == "student":
-        return redirect("dashboard")
-    
-    # Instructor view
-    elif request.session["usertype"] == "instructor":
-        return redirect("dashboard")
-
 
 @login_required(login_url='login')
 def roadmap_items_view(request, class_id, project_id, roadmap_id):
