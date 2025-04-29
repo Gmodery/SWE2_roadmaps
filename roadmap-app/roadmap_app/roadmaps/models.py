@@ -122,17 +122,7 @@ class Task(models.Model):
     def __str__(self):
         return self.task_name
 
-#FUNCTION CALL FOR GROUP ROADMAPS creation  
-class GroupRoadmap(models.Model):
-    title = models.CharField(max_length=255)
-    description = models.TextField()
-    students = models.ManyToManyField(AppUser, related_name='group_roadmaps')
-    parent_project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.title
-
+    
 
     
 
