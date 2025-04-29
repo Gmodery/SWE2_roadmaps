@@ -68,6 +68,28 @@ body {
     border-radius: 4px;
 }
 
+/* Image Positioning
+.image-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    bottom: 30%;
+  }
+  
+  .frog, .lilypad {
+    position: absolute;
+  }
+  
+  .frog {
+    top: 30%;
+    left: 65%;
+  }
+  
+  .lilypad {
+    top: 52%;
+    left: 62%;
+  }   */
+
 /* Join a Class Section */
 .join-class {
     background-color: #003a40;
@@ -144,6 +166,7 @@ body {
 
 /* Course Card */
 .course-card {
+    display: block;
     background-color: white;
     padding: 20px;
     border-radius: 10px;
@@ -152,20 +175,40 @@ body {
     width: 200px;
     height: 150px;
     transition: transform 0.2s ease-in-out;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    cursor: pointer;
 }
 
 .course-card h2 {
     font-size: 20px;
-    margin-bottom: 12px;
+    margin: 10px 0;
+    color: #000;
 }
-
 .course-card p {
-    font-size: 15px;
-    color: gray;
+    font-size: 14px;
+    color: #666;
 }
 
 .course-card:hover {
     transform: scale(1.05);
+}
+
+.card-link {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    text-decoration: none;
+}
+
+
+.course-card {
+    position: relative;
+    cursor: pointer;
 }
 
 .course-card button {

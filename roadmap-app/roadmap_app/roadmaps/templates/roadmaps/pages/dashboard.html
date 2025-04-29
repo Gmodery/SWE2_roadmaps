@@ -20,6 +20,7 @@
                 <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
                 <li><a href="{% url 'account' %}">Account</a></li>
                 <li><a href="{% url 'logout' %}">Logout</a></li>
+
             </ul>
 
             <!-- Join a Class Section -->
@@ -57,7 +58,12 @@
 
                 {% endif %}
             </div>
+            <!-- <div class="image-container">
+                <img src="{% static 'images/lilypad.png' %}" alt="lilypad" class="lilypad">
+                <img src="{% static 'images/frog.png' %}" alt="frog" class="frog">
+            </div> -->
         </div>
+
 
         <!-- Main Dashboard Content -->
         <div class="main-content">
@@ -85,6 +91,7 @@
                 <p>No classes available.</p>
                 {% endfor %}
             </div>
+            
             <h2 class="section-header">Roadmaps</h2>
             <hr class="section-divider">
         </div>

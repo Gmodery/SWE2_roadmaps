@@ -65,6 +65,9 @@ def signup_view(request):
 
 
 def logout_view(request):
+    if 'welcome_shown' in request.session:
+        del request.session['welcome_shown']
+
     logout(request)
     return redirect('login')
 
@@ -97,6 +100,11 @@ def join_class_view(request):
 
 @login_required(login_url='login')
 def dashboard(request):
+    #welcome message
+    if not request.session.get("welcome_shown"):
+        request.session["welcome_shown"] = True
+        messages.success(request, f"Welcome {request.user.first_name}!")
+
     # Student view
     if request.session["usertype"] == "student":
 
