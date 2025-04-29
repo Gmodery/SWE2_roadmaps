@@ -19,6 +19,12 @@ from django.urls import path
 from roadmaps import views
 
 urlpatterns = [
+    path('pages/dashboard/class/<int:class_id>/project/<int:project_id>/group-roadmap/<int:roadmap_id>/', views.group_roadmap_details_view, name='group_roadmap_details'),
+    path('dashboard/class/<int:class_id>/project/<int:project_id>/group-roadmap/<int:roadmap_id>/', views.roadmap_details_view, name='group_roadmap_details'),
+    path('pages/dashboard/class/<int:class_id>/project/<int:project_id>/create-group-roadmap/', views.create_group_roadmap_view, name='create_group_roadmap'),
+
+
+    
     path('admin/', admin.site.urls),
     path("", views.home, name="home"),
     path("login/", views.login_view, name="login"),

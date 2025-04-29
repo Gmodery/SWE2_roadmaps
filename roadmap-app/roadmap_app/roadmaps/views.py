@@ -272,49 +272,78 @@ def create_project_view(request, class_id):
         return redirect("dashboard")
 
 from .models import Roadmap, GroupRoadmap
-
 @login_required(login_url='login')
 def project_details_view(request, class_id, project_id):
-    # Fetch class and project instances
     class_instance = Class.objects.get(id=class_id)
     project_instance = Project.objects.get(id=project_id)
 
+    # Initialize empty unified list
+    unified_roadmaps = []
+
     # Validate authorization to view this class
     if request.session['usertype'] == "student":
-        # If student, verify that they are in this class
         class_students = class_instance.class_student.all()
         current_student = AppUser.objects.get(id=request.session['user_id'])
 
         if current_student not in class_students:
             return redirect('dashboard')
 
-        # Fetch only the roadmaps assigned to this student
-        all_maps = Roadmap.objects.filter(parent_project=project_instance)
-        roadmaps = []
-        for roadmap in all_maps:
+        # Fetch only roadmaps this student belongs to
+        all_roadmaps = Roadmap.objects.filter(parent_project=project_instance)
+        for roadmap in all_roadmaps:
             if current_student in roadmap.roadmap_students.all():
-                roadmaps.append(roadmap)
+                unified_roadmaps.append({
+                    "type": "individual",
+                    "title": roadmap.roadmap_title,
+                    "description": roadmap.roadmap_description,
+                    "students": roadmap.roadmap_students.all(),
+                    "id": roadmap.id
+                })
 
-        # Students typically won't see group roadmaps yet (optional later)
-        group_roadmaps = []
+        # (Optional) Students could also see group roadmaps if allowed
+        all_group_roadmaps = GroupRoadmap.objects.filter(parent_project=project_instance)
+        for group_map in all_group_roadmaps:
+            if current_student in group_map.students.all():
+                unified_roadmaps.append({
+                    "type": "group",
+                    "title": group_map.title,
+                    "description": group_map.description,
+                    "students": group_map.students.all(),
+                    "id": group_map.id  # No detailed page yet, but prepare for it
+                })
 
     elif request.session['usertype'] == "instructor":
-        # If instructor, verify that they own this class
         if class_instance.class_instructor.id != request.session['user_id']:
             return redirect('dashboard')
 
-        # Instructors can view all roadmaps and group roadmaps
-        roadmaps = Roadmap.objects.filter(parent_project=project_instance)
-        group_roadmaps = GroupRoadmap.objects.filter(parent_project=project_instance)
+        # Instructor sees all roadmaps
+        all_roadmaps = Roadmap.objects.filter(parent_project=project_instance)
+        for roadmap in all_roadmaps:
+            unified_roadmaps.append({
+                "type": "individual",
+                "title": roadmap.roadmap_title,
+                "description": roadmap.roadmap_description,
+                "students": roadmap.roadmap_students.all(),
+                "id": roadmap.id
+            })
 
-    # Render the project detail page
+        all_group_roadmaps = GroupRoadmap.objects.filter(parent_project=project_instance)
+        for group_map in all_group_roadmaps:
+            unified_roadmaps.append({
+                "type": "group",
+                "title": group_map.title,
+                "description": group_map.description,
+                "students": group_map.students.all(),
+                "id": group_map.id
+            })
+
     return render(request, "roadmaps/pages/project_details.html", {
         "student": request.session['usertype'] == "student",
         "class_instance": class_instance,
         "project_instance": project_instance,
-        "roadmaps": roadmaps,
-        "group_roadmaps": group_roadmaps,
+        "unified_roadmaps": unified_roadmaps,
     })
+
 
 def delete_project_view(request, class_id, project_id):
     Project.objects.get(id=project_id).delete()
@@ -752,3 +781,45 @@ def create_group_roadmap(request):
         group_roadmap.students.set(selected_student_ids)
 
         return redirect('dashboard')  # or wherever you want
+@login_required(login_url='login')
+def create_group_roadmap_view(request, class_id, project_id):
+    class_instance = Class.objects.get(id=class_id)
+    project_instance = Project.objects.get(id=project_id)
+    students = class_instance.class_student.all()
+
+    if request.method == 'POST':
+        title = request.POST.get('roadmap_title')
+        description = request.POST.get('roadmap_description')
+        selected_student_ids = request.POST.getlist('selected_students')
+
+        group_roadmap = GroupRoadmap.objects.create(
+            title=title,
+            description=description,
+            parent_project=project_instance
+        )
+
+        group_roadmap.students.set(selected_student_ids)
+
+        return redirect('project-details', class_id=class_id, project_id=project_id)
+
+    # ✅ You were missing this return right here:
+    # in views.py
+    return render(request, 'roadmaps/pages/create-group-roadmap-form.html', {
+        'class_instance': class_instance,
+        'project_instance': project_instance,
+        'students': students,
+    })
+@login_required(login_url='login')
+def group_roadmap_details_view(request, class_id, project_id, roadmap_id):
+    class_instance = Class.objects.get(id=class_id)
+    project_instance = Project.objects.get(id=project_id)
+    roadmap = GroupRoadmap.objects.get(id=roadmap_id)
+
+    return render(request, 'roadmaps/pages/group-roadmap.html', {
+        'class_instance': class_instance,
+        'project_instance': project_instance,
+        'roadmap': roadmap,
+        'students': roadmap.students.all(),
+        'user': request.session['username']
+    })
+

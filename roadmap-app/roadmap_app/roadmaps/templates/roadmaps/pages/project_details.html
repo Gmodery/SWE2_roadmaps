@@ -21,9 +21,7 @@
                 <li><a href="{% url 'account' %}">Account</a></li>
                 <li><a href="{% url 'logout' %}">Logout</a></li>
             </ul>
-
-            <div class="join-class">
-            </div>
+            <div class="join-class"></div>
         </div>
 
         <!-- Main Dashboard Content -->
@@ -33,28 +31,35 @@
 
             <hr>
 
-            <div class="course-grid">
-                {% for roadmap in roadmaps %}
-                    <a href="{% url 'roadmap-details' class_instance.id project_instance.id roadmap.id %}" class="course-card">
-                        <h2>{{ roadmap.roadmap_title }}</h2>
-                        <p>{{ roadmap.roadmap_description }}</p>
-                        
+           <h2>Roadmaps</h2>
 
-                            {% for student in roadmap.roadmap_students.all %}
-                                <p>{{ student.first_name }} {{ student.last_name }},</p>
-                            {% endfor %}
-                    </a>
-                    {% empty %}
-                    {% if not student %}
-                        <p>No roadmaps listed. Create groups below!</p>
-                        
-                    {% else %}
-                        <p>You haven't been added to any roadmaps yet for this project</p>
-                    {% endif %}
-                {% endfor %}
-            </div>
+<div class="course-grid">
+    {% for roadmap in unified_roadmaps %}
+        {% if roadmap.type == "individual" %}
+            <!-- Link to individual roadmap -->
+            <a href="{% url 'roadmap-details' class_instance.id project_instance.id roadmap.id %}" class="course-card">
+        {% else %}
+            <!-- Just a card for group roadmap (no detailed page yet) -->
+            <div class="course-card">
+        {% endif %}
+        
+            <h2>{{ roadmap.title }}</h2>
+            <p>{{ roadmap.description }}</p>
 
-            
+            <p><strong>Students:</strong></p>
+            {% for student in roadmap.students %}
+                <p>{{ student.first_name }} {{ student.last_name }}</p>
+            {% endfor %}
+
+        {% if roadmap.type == "individual" %}
+            </a> <!-- close link -->
+        {% else %}
+            </div> <!-- close div -->
+        {% endif %}
+    {% empty %}
+        <p>No roadmaps yet.</p>
+    {% endfor %}
+</div>
 
             {% if not student %}
                 <hr>
@@ -71,7 +76,6 @@
                             <div>
                                 <div><button type="submit">Create Group</button></div>
                             </div>
-                            
                         </div>
                     </form>
                 </div>
@@ -79,7 +83,6 @@
                 <hr>
                 
                 <h3>Delete Project</h3>
-                
                 <div class="remove-function">
                     <form action="{% url 'project-delete' class_instance.id project_instance.id %}" method="POST"
                         onsubmit="return confirm('Are you sure you want to delete this project? All assigned roadmaps will also be deleted!');">
@@ -87,10 +90,8 @@
                         <button type="submit">Delete Project</button>
                     </form>
                 </div>
-
             {% endif %}
         </div>
-        
 
     </div>
 

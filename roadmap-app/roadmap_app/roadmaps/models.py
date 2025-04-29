@@ -121,11 +121,12 @@ class GroupRoadmap(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     students = models.ManyToManyField(AppUser, related_name='group_roadmaps')
-    parent_project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True, blank=True)
+    parent_project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='group_roadmaps', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title
+
 
 
     
