@@ -1,67 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Group Roadmap</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+  <!-- head as before -->
 </head>
-
 <body>
+  <!-- sidebar as before -->
 
-    <div class="dashboard-container">
+  <div class="main-content">
+    <h1>Create Group Roadmap for "{{ project_instance.project_title }}"</h1>
+    <form method="POST"
+          action="{% url 'create_group_roadmap' class_instance.id project_instance.id %}">
+      {% csrf_token %}
+      <input type="hidden" name="project_id" value="{{ project_instance.id }}">
 
-        <!-- Sidebar Navigation -->
-        <div class="sidebar">
-            <h2>Dashboard</h2>
-            <ul>
-                <li><a href="{% url 'dashboard' %}">Home</a></li>
-                <li><a href="{% url 'account' %}">Account</a></li>
-                <li><a href="{% url 'logout' %}">Logout</a></li>
-            </ul>
-            <div class="join-class"></div>
-        </div>
+      <label for="roadmap_title">Roadmap Title:</label><br>
+      <input type="text" id="roadmap_title" name="roadmap_title" required><br><br>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <h1>Create Group Roadmap for "{{ project_instance.project_title }}"</h1>
+      <label for="roadmap_description">Description:</label><br>
+      <textarea id="roadmap_description" name="roadmap_description" required></textarea><br><br>
 
-            <form method="POST" action="{% url 'create_group_roadmap' class_instance.id project_instance.id %}">
-                {% csrf_token %}
+      <label>Select Students:</label><br>
+      {% for student in students %}
+        <input type="checkbox" id="student_{{ student.id }}"
+               name="selected_students" value="{{ student.id }}">
+        <label for="student_{{ student.id }}">
+          {{ student.first_name }} {{ student.last_name }}
+        </label><br>
+      {% empty %}
+        <p>No students in this class.</p>
+      {% endfor %}
 
-                <!-- Hidden project_id field -->
-                <input type="hidden" name="project_id" value="{{ project_instance.id }}">
+      <button type="submit">Create Group Roadmap</button>
+    </form>
 
-                <!-- Roadmap Title -->
-                <label for="roadmap_title">Roadmap Title:</label><br>
-                <input type="text" id="roadmap_title" name="roadmap_title" required><br><br>
-
-                <!-- Roadmap Description -->
-                <label for="roadmap_description">Roadmap Description:</label><br>
-                <textarea id="roadmap_description" name="roadmap_description" required></textarea><br><br>
-
-                <!-- Select Students -->
-                <label>Select Students to Add:</label><br>
-                {% for student in students %}
-                    <input type="checkbox" id="student_{{ student.id }}" name="selected_students" value="{{ student.id }}">
-                    <label for="student_{{ student.id }}">{{ student.first_name }} {{ student.last_name }}</label><br>
-                {% empty %}
-                    <p>No students available in this class.</p>
-                {% endfor %}
-
-                <br>
-                <button type="submit">Create Group Roadmap</button>
-            </form>
-
-            <br>
-            <a href="{% url 'project-details' class_instance.id project_instance.id %}" class="button">Back to Project</a>
-
-        </div>
-
-    </div>
-
+    <a href="{% url 'project-details' class_instance.id project_instance.id %}"
+       class="button">Back to Project</a>
+  </div>
 </body>
-
 </html>

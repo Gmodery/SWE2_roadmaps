@@ -24,7 +24,7 @@ urlpatterns = [
     path('pages/dashboard/class/<int:class_id>/project/<int:project_id>/create-group-roadmap/', views.create_group_roadmap_view, name='create_group_roadmap'),
 
 
-    
+
     path('admin/', admin.site.urls),
     path("", views.home, name="home"),
     path("login/", views.login_view, name="login"),
@@ -37,7 +37,6 @@ urlpatterns = [
     path('pages/dashboard/create-project/<int:class_id>/', views.create_project_view, name='project-create'),
     path('pages/dashboard/class/<int:class_id>/project/<int:project_id>/', views.project_details_view, name='project-details'),
     path('pages/dashboard/class/<int:class_id>/project/<int:project_id>/delete', views.delete_project_view, name='project-delete'),
-    path('pages/dashboard/class/<int:class_id>/project/<int:project_id>/create-roadmaps', views.create_roadmap_view, name='roadmap-create'),
     path('pages/dashboard/class/<int:class_id>/project/<int:project_id>/<int:roadmap_id>/', views.roadmap_details_view, name='roadmap-details'),
     path('pages/dashboard/class/<int:class_id>/project/<int:project_id>/<int:roadmap_id>/items', views.roadmap_items_view, name='roadmap-items'),
     path('pages/dashboard/account', views.account_detail_view, name='account'),
