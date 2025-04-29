@@ -15,13 +15,13 @@
 
         <!-- Sidebar Navigation -->
         <div class="sidebar">
-            <h2>Dashboard</h2>
+            <h2>Home</h2>
             <ul>
-                <li><a href="{% url 'dashboard' %}">Home</a></li>
+                <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
                 <li><a href="{% url 'account' %}">Account</a></li>
                 <li><a href="{% url 'logout' %}">Logout</a></li>
             </ul>
-
+            
             <div class="join-class">
             </div>
         </div>
@@ -73,8 +73,6 @@
                 </div>
 
                 <hr>
-
-                <h3>Delete Class</h3>
 
                 <div class="remove-function">
                     <form action="{% url 'class_delete' class_instance_id %}" method="POST" onsubmit="return confirm('Are you sure you want to delete this class?');">

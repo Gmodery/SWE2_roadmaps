@@ -8,8 +8,10 @@ from .models import AppUser, Class, Roadmap, Project
 # ------------------------------
 class SignUpForm(UserCreationForm):
     first_name = forms.CharField(
-        max_length=30, required=True,
-        widget=forms.TextInput(attrs={'placeholder': 'Enter First Name'})
+    max_length=30,
+    required=True,
+    widget=forms.TextInput(attrs={
+        'placeholder': 'Enter First Name', 'autofocus': True})
     )
     last_name = forms.CharField(
         max_length=30, required=True,
@@ -21,7 +23,8 @@ class SignUpForm(UserCreationForm):
     )
     username = forms.CharField(
         max_length=150, required=True,
-        widget=forms.TextInput(attrs={'placeholder': 'Enter Username'})
+        widget=forms.TextInput(attrs={'placeholder': 'Enter Username',
+        'autofocus': False})
     )
     password1 = forms.CharField(
         required=True,
@@ -62,20 +65,17 @@ class AppUserRoleForm(forms.ModelForm):
 class CreateClassForm(forms.ModelForm):
     class_name = forms.CharField(
         max_length=30, required=True,
-        widget=forms.TextInput(attrs={'placeholder': 'Class Name'})
+        widget=forms.TextInput(attrs={'placeholder': 'Class Name', 'class': 'form-input'})
     )
     class_desc = forms.CharField(
         max_length=160, required=True,
-        widget=forms.Textarea(attrs={'placeholder': 'Class Description', 'rows': 3})
+        widget=forms.Textarea(attrs={'placeholder': 'Class Description', 'rows': 3,'class': 'form-textarea'})
     )
 
     class Meta:
         model = Class
         fields = ["class_name", "class_desc"]
 
-# ------------------------------
-# INSTRUCTOR: CREATE PROJECT FORM
-# ------------------------------
 class CreateProjectForm(forms.ModelForm):
     project_name = forms.CharField(
         max_length=30, required=True,
