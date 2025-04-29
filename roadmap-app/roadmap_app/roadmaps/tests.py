@@ -78,3 +78,27 @@ class NavigationTestCase(TestCase):
         """Test redirection for pages requiring login"""
         response = self.client.get(reverse('dashboard'))
         self.assertRedirects(response, '/login/?next=/pages/dashboard')
+
+
+from .models import GroupRoadmap
+
+def create_group_roadmap(request):
+    if request.method == 'POST':
+        title = request.POST.get('roadmap_title')
+        description = request.POST.get('roadmap_description')
+        selected_student_ids = request.POST.getlist('selected_students')
+
+        # Create the GroupRoadmap
+        group_roadmap = GroupRoadmap.objects.create(
+            title=title,
+            description=description
+        )
+
+        # Add selected students to it
+        group_roadmap.students.set(selected_student_ids)
+
+        # Optional: Redirect or show success message
+        return redirect('dashboard')  # or wherever you want to go after creation
+
+    # If GET request, render form (you already have the form page)
+    # return render(request, 'roadmap_app/create_group_roadmap.html')

@@ -11,14 +11,14 @@
     <title>Create Roadmap</title>
 
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/create_roadmap_form_styles.css' %}">
 </head>
 
 
 <form method="POST">
     {% csrf_token %}
 
-    <label for="roadmap_title">Roadmap Title:</label>
+    <label for="roadmap_title">Group Roadmap Title:</label>
     <input type="text" name="roadmap_title" id="roadmap_title" required>
     
     <label for="roadmap_description">Roadmap Description:</label>
@@ -26,19 +26,20 @@
 
     {% if class_instance %}
     <h2>Students in {{ class_instance.class_name }}:</h2>
-        {% csrf_token %}
-    
-        <h3>Assign Students to Groups</h3>
-        <table>
+    <h3>Select Students for this Roadmap</h3>
+    <table>
+        <thead>
             <tr>
                 <th>Student Name</th>
-                <th>Group Number</th>
+                <th>Select</th>
             </tr>
+        </thead>
+        <tbody>
             {% for student in students %}
             <tr>
                 <td>{{ student.username }}</td>
                 <td>
-                    <input type="number" name="group_{{ student.id }}" min="1" required>
+                    <input type="checkbox" name="selected_students" value="{{ student.id }}">
                 </td>
             </tr>
             {% empty %}
@@ -46,8 +47,10 @@
                 <td colspan="2">No students enrolled.</td>
             </tr>
             {% endfor %}
-        </table>
-    {% endif %}
+        </tbody>
+    </table>
+{% endif %}
+
 
 
 
