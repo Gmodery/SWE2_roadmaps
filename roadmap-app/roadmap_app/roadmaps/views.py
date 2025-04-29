@@ -302,8 +302,7 @@ def project_details_view(request, class_id, project_id):
         
         # If instructor, able to view all roadmaps for this project
         roadmaps = Roadmap.objects.filter(parent_project=project_instance)
-        
-    print(class_instance.id, project_instance.id, roadmaps[0].id)
+    
 
     return render(request, "roadmaps/pages/project_details.html", {"student": request.session['usertype'] == "student", "class_instance": class_instance,
                                                                    "project_instance": project_instance, "roadmaps": roadmaps})
