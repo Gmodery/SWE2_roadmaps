@@ -25,42 +25,48 @@
             <!-- Join a Class Section -->
             <div class="join-class">
                 {% if student %}
-                    <h3>Join a Class</h3>
-                    <form method="POST" action="{% url 'join_class' %}">
-                        {% csrf_token %}
-                        <input type="text" name="join_code" placeholder="Enter Code" required>
-                        <button type="submit">Join</button>
-                    </form>
+                <h3>Join a Class</h3>
+                <form method="POST" action="{% url 'join_class' %}">
+                    {% csrf_token %}
+                    <input type="text" name="join_code" placeholder="Enter Code" required>
+                    <button type="submit">Join</button>
+                </form>
 
                 {% else %}
-                    <h3>Create a Class</h3>
-                    <form method="POST">
-                        {% csrf_token %}
-                    
-                        <label for="{{ form.class_name.id_for_label }}">Class Name:</label>
-                        {{ create_class_form.class_name }}
-                    
-                        <label for="{{ form.class_desc.id_for_label }}">Description:</label>
-                        {{ create_class_form.class_desc }}
-                    
-                        <button type="submit">Create</button>
-                    </form>
+                <h3>Create a Class</h3>
+                <form method="POST">
+                    {% csrf_token %}
 
-                    {% if messages %}
-                        <div class="messages">
-                            {% for message in messages %}
-                                <p class="success-message">{{ message }}</p>
-                                <p class="failure-message">{{ message }}</p>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                
+                    <label for="{{ form.class_name.id_for_label }}">Class Name:</label>
+                    {{ create_class_form.class_name }}
+
+                    <label for="{{ form.class_desc.id_for_label }}">Description:</label>
+                    {{ create_class_form.class_desc }}
+
+                    <button type="submit">Create</button>
+                </form>
+
+                <!-- {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                    <p class="success-message">{{ message }}</p>
+                    <p class="failure-message">{{ message }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %} -->
+
                 {% endif %}
             </div>
         </div>
 
         <!-- Main Dashboard Content -->
         <div class="main-content">
+            {% if messages %}
+            {% for message in messages %}
+            <h2 class="message-title {{ message.tags }}">{{ message|title }}</h2>
+            {% endfor %}
+            {% endif %}
+
             <h1 class="main-header">Dashboard</h1>
             <hr class="section-divider">
 
@@ -72,7 +78,7 @@
                 <a href="{% url 'class_detail' class_instance.id %}" class="course-card">
                     <h2>{{ class_instance.class_name }}</h2>
                     {% if student %}
-                        <p>Instructor: {{ class_instance.class_instructor.username }}</p>
+                    <p>Instructor: {{ class_instance.class_instructor.username }}</p>
                     {% endif %}
                 </a>
                 {% empty %}

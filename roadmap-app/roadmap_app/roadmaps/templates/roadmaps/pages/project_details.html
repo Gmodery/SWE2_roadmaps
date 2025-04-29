@@ -15,9 +15,9 @@
 
         <!-- Sidebar Navigation -->
         <div class="sidebar">
-            <h2>Dashboard</h2>
+            <h2>Home</h2>
             <ul>
-                <li><a href="{% url 'dashboard' %}">Home</a></li>
+                <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
                 <li><a href="{% url 'account' %}">Account</a></li>
                 <li><a href="{% url 'logout' %}">Logout</a></li>
             </ul>
@@ -66,10 +66,10 @@
                         {% csrf_token %}
                         <div>
                             <div>
-                                <h3>Create Roadmaps</h3>
+                                <h3>Create Group (Roadmaps)</h3>
                             </div>
                             <div>
-                                <div><button type="submit">Create Roadmaps</button></div>
+                                <div><button type="submit">Create Group</button></div>
                             </div>
                             
                         </div>
@@ -77,8 +77,6 @@
                 </div>
                 
                 <hr>
-                
-                <h3>Delete Project</h3>
                 
                 <div class="remove-function">
                     <form action="{% url 'project-delete' class_instance.id project_instance.id %}" method="POST"
